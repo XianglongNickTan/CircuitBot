@@ -265,6 +265,40 @@ class MoveItIkDemo:
 		moveit_commander.roscpp_shutdown()
 		moveit_commander.os._exit(0)
 
+	def draw_circle_v2(self, key_points):
+		joint_goal = self.arm.get_current_joint_values()
+		joint_goal[0] = 
+		joint_goal[0] = 
+		joint_goal[0] = 
+		joint_goal[0] = 
+		joint_goal[0] = 
+		joint_goal[0] = 
+		joint_goal[0] = 
+		joint_goal[0] = 
+
+		self.arm.go(joint_goal, wait = True)
+		self.arm.stop()
+
+
+	def draw_circle_v3(self, xy_center_pos, radius = 0.10):
+		waypoints = []
+		wpose = self.arm.get_current_joint_values().pose
+		for t in range(self.cont):
+			wpose.position.x = xy_center_pos[0] + radius * math.cos( 2 * math.pi * t / self.cont)
+			wpose.position.y = xy_center_pos[1] + radius * math.sin( 2 * math.pi * t / self.cont)
+			waypoints.append(copy.deepcopy(wpose))
+		(plan, fraction) = self.compute_cartesian_path(
+			waypoints,
+			0.01
+			0.0
+		)
+		self.arm.execute(plan)
+
+		moveit_commander.roscpp_shutdown()
+		moveit_commander.os._exit(0)
+		
+
+
 
 
         
@@ -275,4 +309,4 @@ class MoveItIkDemo:
 if __name__ == "__main__":
 	demo = MoveItIkDemo()
 	point = [-0.3, -0.3]
-	demo.draw_circles(point, 0.1)
+	demo.draw_circle_v3(point, 0.1)
