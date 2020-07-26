@@ -4,6 +4,8 @@ import time
 import pandas as pd
 from bayes_opt import BayesianOptimization
 from bayes_opt import UtilityFunction
+# from bayes_opt import SequentialDomainReductionTransformer
+
 
 from black_box_function import MoveItIkDemo
 
@@ -13,12 +15,17 @@ def circuitBot(robot_arm):
     optimizer = BayesianOptimization(
         f=None,
         pbounds={'x': (-100, 100), 'y': (-70, 70)},
-        verbose=2,
+        verbose=2,  # choices: 0, 1, 2
         random_state=1,
+        # bounds_transformer = SequentialDomainReductionTransformer()
     )
+    # For kind = "ucb", small kappa (1) prefer exploitation, big kappa (10) prefer exploration
+    # For kind = "ei", small xi (0.0) prefer exploitation, big xi (0.0) prefer exploration
+    # kind = "poi", small xi (0.0) prefer exploitation, big xi (0.0) prefer exploration
 
-    utility = UtilityFunction(kind="ucb", kappa=2.5, xi=0.0)
-
+    utility = UtilityFunction(kind="ucb", kappa=10, xi=0.0)
+    
+    # To output paramters and voltage as a csv file
     name = ['x', 'y', 'voltage']
     csv_list = []
 
@@ -26,9 +33,13 @@ def circuitBot(robot_arm):
     for _ in range(10):
         next_to_probe = optimizer.suggest(utility) # A dict to tell you the next parameters to probe
 
+        # Currently, this draw_circle only contains a black box function
         robot_arm.draw_circle(next_to_probe)
 
+        ###################################################
+        # Now we should wait the robot arm draw circle
         #time.sleep(1)
+        ###################################################
 
         voltage_file = open("voltage.txt", "r")
         # while not voltage_file:
@@ -44,6 +55,7 @@ def circuitBot(robot_arm):
             target=float(voltage)
         )
 
+        # To record these parameter and voltage
         tmp = []
         for key in next_to_probe:
             tmp.append(next_to_probe[key])
