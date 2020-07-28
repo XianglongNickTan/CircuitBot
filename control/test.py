@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import rospy, sys
@@ -6,6 +7,8 @@ from moveit_commander import PlanningSceneInterface
 from geometry_msgs.msg import PoseStamped
 from geometry_msgs.msg import PointStamped
 import math
+import numpy as np
+import copy
 
 
 class MoveItIkDemo:
@@ -45,21 +48,26 @@ class MoveItIkDemo:
 		scene = PlanningSceneInterface()
 		rospy.sleep(1)
 
-		# 控制机械臂先回到初始化位置，手爪打开
-		self.arm.set_named_target('Home')
-		self.arm.go()
-		# self.gripper.set_named_target('Open')
-		# self.gripper.go()
-		rospy.sleep(1)
+		# # 控制机械臂先回到初始化位置，手爪打开
+		# self.arm.set_named_target('Home')
+		# self.arm.go()
+		# # self.gripper.set_named_target('Open')
+		# # self.gripper.go()
+		# rospy.sleep(1)
 
 		# 设置机械臂工作空间中的目标位姿，位置使用x、y、z坐标描述，
 		# 姿态使用四元数描述，基于base_link坐标系
 
-		self.cont = 10
+		self.cont = 40
 		self.radius = 0.10
 
+
 		self.target_pose = PoseStamped()
-		self.target_pose.pose.position.z = 0.3
+		self.target_pose.header.frame_id = self.reference_frame
+		self.target_pose.pose.position.x = 0
+		self.target_pose.pose.position.y = -0.3
+		self.target_pose.pose.position.z = -0.03
+
 		self.target_pose.pose.orientation.x = 0.14578
 		self.target_pose.pose.orientation.y = 0.98924
 		self.target_pose.pose.orientation.z = -0.0085346
@@ -67,28 +75,73 @@ class MoveItIkDemo:
 
 
 	def draw_circles(self, xy_center_pos):
+		
+		x_list = []
+		y_list = []
 
 		for t in range(self.cont):
-			self.target_pose.header.frame_id = self.reference_frame
-			self.target_pose.header.stamp = rospy.Time.now()
-			self.target_pose.pose.position.x = xy_center_pos[0] + self.radius * math.cos( 2 * math.pi * t / self.cont)
-			self.target_pose.pose.position.y = xy_center_pos[1] + self.radius * math.sin( 2 * math.pi * t / self.cont)
+			# self.target_pose.header.stamp = rospy.Time.now()
+			x_list.append(xy_center_pos[0] + self.radius * math.cos( 2 * math.pi * t / self.cont))
+			y_list.append(xy_center_pos[1] + self.radius * math.sin( 2 * math.pi * t / self.cont))
 
+
+		for t in range(self.cont):
+			# self.target_pose.header.stamp = rospy.Time.now()
+			# self.target_pose.pose.position.x = xy_center_pos[0] + self.radius * math.cos( 2 * math.pi * t / self.cont)
+			# self.target_pose.pose.position.y = xy_center_pos[1] + self.radius * math.sin( 2 * math.pi * t / self.cont)
+			self.target_pose.pose.position.x = x_list[t]
+			self.target_pose.pose.position.y = y_list[t]
+
+			
 			# 设置机器臂当前的状态作为运动初始状态
 			self.arm.set_start_state_to_current_state()
 			# 设置机械臂终端运动的目标位姿
 			self.arm.set_pose_target(self.target_pose, self.end_effector_link)
-			# 规划运动路径
+
+			# # 规划运动路径
 			traj = self.arm.plan()
+			# print(traj)
 			# 按照规划的运动路径控制机械臂运动
 			self.arm.execute(traj)
+			# self.arm.execute(self.arm.plan())
 			# rospy.sleep(1)
 
 
 		moveit_commander.roscpp_shutdown()
 		moveit_commander.os._exit(0)
 
+	def draw_circle_v3(self, xy_center_pos, radius = 0.03):
+		waypoints = []
+		# rospy.rostime.wallsleep(0.05)
+		wpose = self.arm.get_current_pose().pose
+		wpose.orientation.x = 0.14578
+		wpose.orientation.y = 0.98924
+		wpose.orientation.z = -0.0085346
+		wpose.orientation.w = 0.0084136
+		wpose.position.z = -0.03
+		for t in range(self.cont):
+			wpose.position.x = xy_center_pos[0] + radius * np.cos( 2 * np.pi * t / self.cont)
+			wpose.position.y = xy_center_pos[1] + radius * np.sin( 2 * np.pi * t / self.cont)
+			# wpose.position.z = -0.03
+
+			waypoints.append(copy.deepcopy(wpose))
+		(plan, fraction) = self.arm.compute_cartesian_path(
+			waypoints,
+			0.001,             # SUPER IMPORTANT PARAMETER FOR VELOCITY CONTROL !!!!!
+			0.0
+		)
+		# print("~~~~~~~~~~~~~~~~~~~~")
+		# print(plan)
+		# print("~~~~~~~~~~~~~~~~~~~~")
+
+		self.arm.execute(plan)
+
+		moveit_commander.roscpp_shutdown()
+		moveit_commander.os._exit(0)
+			
+
 if __name__ == "__main__":
 	demo = MoveItIkDemo()
-	point = [-0.3, -0.3]
-	demo.draw_circles(point)
+	point = [0, -0.3]
+	# demo.draw_circles(point)
+	demo.draw_circle_v3(point)
