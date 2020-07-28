@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 import os
 import time
@@ -7,14 +8,14 @@ from bayes_opt import UtilityFunction
 # from bayes_opt import SequentialDomainReductionTransformer
 
 
-from black_box_function import MoveItIkDemo
+from control import MoveItIkDemo
 
 
 
 def circuitBot(robot_arm):
     optimizer = BayesianOptimization(
         f=None,
-        pbounds={'x': (-100, 100), 'y': (-70, 70)},
+        pbounds={'x': (-0.3, 0.2), 'y': (-0.5, -0.2)},
         verbose=2,  # choices: 0, 1, 2
         random_state=1,
         # bounds_transformer = SequentialDomainReductionTransformer()
