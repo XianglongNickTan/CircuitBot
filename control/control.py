@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
 import rospy, sys
@@ -129,8 +129,8 @@ class MoveItIkDemo:
 
 		voltage = xy_center_pos[0] + xy_center_pos[1]
 		voltage_file = open("voltage.txt", "w")
-        voltage_file.write(str(voltage))
-        voltage_file.close()
+		voltage_file.write(str(voltage))
+		voltage_file.close()
 
 		######################## For testing ########################
 

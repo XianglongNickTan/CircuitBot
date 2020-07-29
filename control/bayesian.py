@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import os
 import time
@@ -49,7 +49,6 @@ def circuitBot(robot_arm):
         voltage = voltage_file.read()
         voltage_file.close()
         os.remove("voltage.txt")
-        print(voltage)
 
         optimizer.register(
             params=next_to_probe,
