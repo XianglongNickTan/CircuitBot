@@ -4,14 +4,15 @@ import time
 import pandas as pd
 from bayes_opt import BayesianOptimization
 from bayes_opt import UtilityFunction
+import keyboard
 # from bayes_opt import SequentialDomainReductionTransformer
 
 
-from control import MoveItIkDemo
+# from control import MoveItIkDemo
 
 
 
-def circuitBot(robot_arm):
+def circuitBot():
     optimizer = BayesianOptimization(
         f=None,
         pbounds={'x': (-0.3, 0.2), 'y': (-0.5, -0.2)},
@@ -33,18 +34,21 @@ def circuitBot(robot_arm):
     for _ in range(10):
         next_to_probe = optimizer.suggest(utility) # A dict to tell you the next parameters to probe
 
-        # Currently, this draw_circle only contains a black box function
-        robot_arm.draw_circle(next_to_probe)
+        point_file = open("point.txt", "w")
+        point_str = str()
+        for key in next_to_probe:
+            point_str += next_to_probe[key]
+            point_str += " "
+        point_file.write(point_str)
 
         ###################################################
         # Now we should wait the robot arm draw circle
-        #time.sleep(1)
+        # Pass q when the robot arm finish
         ###################################################
 
+        keyboard.wait("q")
+
         voltage_file = open("voltage.txt", "r")
-        # while not voltage_file:
-        #     print(voltage_file)
-        #     voltage_file = open("voltage.txt", "r")
         voltage = voltage_file.read()
         voltage_file.close()
         os.remove("voltage.txt")
@@ -68,5 +72,4 @@ def circuitBot(robot_arm):
 
 
 if __name__ == "__main__":
-    demo = MoveItIkDemo()
-    circuitBot(demo)
+    circuitBot()

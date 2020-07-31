@@ -226,6 +226,11 @@ class MoveItIkDemo:
 
 if __name__ == "__main__":
 	demo = MoveItIkDemo()
-	point = [-0.1, -0.46]
+
+	point_file = open("point.txt", "r")
+    point_str = point_file.read()
+	point_list = point_str.split()
+    point_file.close()
+    os.remove("point.txt")
 	# demo.draw_line()
-	demo.draw_circle(point)
+	demo.draw_circle(point_list)
