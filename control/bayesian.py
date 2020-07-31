@@ -37,13 +37,18 @@ def circuitBot():
         point_file = open("point.txt", "w")
         point_str = str()
         for key in next_to_probe:
-            point_str += next_to_probe[key]
+            point_str += str(next_to_probe[key])
             point_str += " "
+        print(point_str)
         point_file.write(point_str)
+        point_file.close()
+
+        print("Now, change to the other termial to let robot arm draw.")
+        print("Press q when it finished.")
 
         ###################################################
         # Now we should wait the robot arm draw circle
-        # Pass q when the robot arm finish
+        # Pass q when the robot arm finished
         ###################################################
 
         keyboard.wait("q")

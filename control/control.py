@@ -8,6 +8,7 @@ import math
 import numpy as np
 import copy
 import serial
+import os
 
 arduino = serial.Serial('/dev/ttyACM0',9600)
 
@@ -228,9 +229,12 @@ if __name__ == "__main__":
 	demo = MoveItIkDemo()
 
 	point_file = open("point.txt", "r")
-    point_str = point_file.read()
+	point_str = point_file.read()
+	print(point_str)
 	point_list = point_str.split()
-    point_file.close()
-    os.remove("point.txt")
+	point_file.close()
+	# os.remove("point.txt")
+	print(point_list)
+	point = [float(point_list[0]), float(point_list[1])]
 	# demo.draw_line()
-	demo.draw_circle(point_list)
+	demo.draw_circle(point)
