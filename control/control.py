@@ -1,11 +1,9 @@
-#!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
 import rospy, sys
 import moveit_commander
 from moveit_commander import PlanningSceneInterface
 from geometry_msgs.msg import PoseStamped
-from geometry_msgs.msg import PointStamped
 import math
 import numpy as np
 import copy
@@ -59,81 +57,133 @@ class MoveItIkDemo:
 		# # self.gripper.go()
 		# rospy.sleep(1)
 
-		# 设置机械臂工作空间中的目标位姿，位置使用x、y、z坐标描述，
-		# 姿态使用四元数描述，基于base_link坐标系
-
-		self.cont = 40
+		self.line_cont = 40
+		self.circle_cont = 40
 		self.radius = 0.10
-
 
 		self.target_pose = PoseStamped()
 		self.target_pose.header.frame_id = self.reference_frame
-		self.target_pose.pose.position.x = 0
-		self.target_pose.pose.position.y = -0.3
-		self.target_pose.pose.position.z = 0.1
+		# self.target_pose.pose.position.x = 0
+		# self.target_pose.pose.position.y = -0.3
+		self.target_pose.pose.position.z = 0.05
 
 		self.target_pose.pose.orientation.x = 0.14578
 		self.target_pose.pose.orientation.y = 0.98924
 		self.target_pose.pose.orientation.z = -0.0085346
 		self.target_pose.pose.orientation.w = 0.0084136
 
-	def draw_circle(self, xy_center_pos, radius = 0.03):
+	def draw_line(self, xy_init_pos=None):
 		waypoints = []
-		# rospy.rostime.wallsleep(0.05)
+		# if xy_end_pos is None:
+		# 	xy_end_pos = [-0.2, -0.25]
+
+		if xy_init_pos is None:
+			xy_init_pos = [0.25, -0.48]
+
+		self.target_pose.header.stamp = rospy.Time.now()
+		self.target_pose.pose.position.x = xy_init_pos[0]
+		self.target_pose.pose.position.y = xy_init_pos[1]
+		self.arm.set_start_state_to_current_state()
+		self.arm.set_pose_target(self.target_pose, self.end_effector_link)
+		traj = self.arm.plan()
+		self.arm.execute(traj)
+		rospy.sleep(1)
+
+
 		wpose = self.arm.get_current_pose().pose
 		wpose.orientation.x = 0.14578
 		wpose.orientation.y = 0.98924
-		wpose.orientation.z = -0.0085346
-		wpose.orientation.w = 0.0084136
+		wpose.orientation.z = -0.00853
+		wpose.orientation.w = 0.00841
 		wpose.position.z = 0.03
 
-		wpose.position.x = xy_center_pos[0] + radius
-		# wpose.position.x = xy_center_pos[0]
-		wpose.position.y = xy_center_pos[1]
-
-		waypoints.append(copy.deepcopy(wpose))
-		(plan, fraction) = self.arm.compute_cartesian_path(
-			waypoints,
-			0.1,             # SUPER IMPORTANT PARAMETER FOR VELOCITY CONTROL !!!!!
-			0.0
-		)
-
-		self.arm.execute(plan)
-
-
-		for t in range(self.cont-2):
-			wpose.position.x = xy_center_pos[0] + radius * np.cos( 2 * np.pi * (t+1) / self.cont)
-			wpose.position.y = xy_center_pos[1] + radius * np.sin( 2 * np.pi * (t+1) / self.cont)
-			# wpose.position.z = -0.03
-
+		for t in range(self.line_cont):
+			wpose.position.x = (xy_init_pos[0] - 0.5 / self.line_cont * (t + 1))
+			wpose.position.y = xy_init_pos[1]
 			waypoints.append(copy.deepcopy(wpose))
+
 		(plan, fraction) = self.arm.compute_cartesian_path(
 			waypoints,
-			0.0005,             # SUPER IMPORTANT PARAMETER FOR VELOCITY CONTROL !!!!!
+			0.005,             # SUPER IMPORTANT PARAMETER FOR VELOCITY CONTROL !!!!!
 			0.0
 		)
-		# print("~~~~~~~~~~~~~~~~~~~~")
-		# print(plan)
-		# print("~~~~~~~~~~~~~~~~~~~~")
 		arduino.write('1')
 		self.arm.execute(plan)
 		arduino.write('0')
 
+		rospy.sleep(5)
 
-		moveit_commander.roscpp_shutdown()
-		moveit_commander.os._exit(0)
 
+	def draw_circle(self, xy_center_pos, radius = 0.03):
+		waypoints = []
+		# rospy.rostime.wallsleep(0.05)
+		wpose = self.arm.get_current_pose().pose
+
+		# self.target_pose.header.frame_id = self.reference_frame
+		# self.target_pose.header.stamp = rospy.Time.now()
+
+		self.target_pose.header.stamp = rospy.Time.now()
+		self.target_pose.pose.position.x = xy_center_pos[0] + radius
+		self.target_pose.pose.position.y = xy_center_pos[1]
+		self.arm.set_start_state_to_current_state()
+		self.arm.set_pose_target(self.target_pose, self.end_effector_link)
+		traj = self.arm.plan()
+		self.arm.execute(traj)
+		rospy.sleep(1)
+
+
+
+		wpose.orientation.x = 0.14578
+		wpose.orientation.y = 0.98924
+		wpose.orientation.z = -0.00853
+		wpose.orientation.w = 0.00841
+		wpose.position.z = 0.03
+		#
+		# wpose.position.x = xy_center_pos[0] + radius
+		# wpose.position.y = xy_center_pos[1]
+		#
+		# waypoints.append(copy.deepcopy(wpose))
+		# (plan, fraction) = self.arm.compute_cartesian_path(
+		# 	waypoints,
+		# 	0.1,             # SUPER IMPORTANT PARAMETER FOR VELOCITY CONTROL !!!!!
+		# 	0.0
+		# )
+		#
+		# self.arm.execute(plan)
+
+
+		for t in range(self.circle_cont-2):
+			wpose.position.x = xy_center_pos[0] + radius * np.cos( 2 * np.pi * (t+1) / self.circle_cont)
+			wpose.position.y = xy_center_pos[1] + radius * np.sin( 2 * np.pi * (t+1) / self.circle_cont)
+			# wpose.position.z = 0.03
+			waypoints.append(copy.deepcopy(wpose))
+
+		(plan, fraction) = self.arm.compute_cartesian_path(
+			waypoints,
+			# 0.0005,             # SUPER IMPORTANT PARAMETER FOR VELOCITY CONTROL !!!!!
+			0.01,  # SUPER IMPORTANT PARAMETER FOR VELOCITY CONTROL !!!!!
+			0.0
+		)
+		arduino.write('1')
+		self.arm.execute(plan)
+		arduino.write('0')
 
 
 		######################## For testing ########################
 
 		voltage = xy_center_pos[0] + xy_center_pos[1]
 		voltage_file = open("voltage.txt", "w")
+		print ("-------------------------")
+		print ("file name: ", voltage_file.name)
+		print ("-------------------------")
 		voltage_file.write(str(voltage))
 		voltage_file.close()
 
 		######################## For testing ########################
 
+
+		moveit_commander.roscpp_shutdown()
+		moveit_commander.os._exit(0)
 
 
 	# def draw_circle_old(self, xy_center_pos):
@@ -176,5 +226,6 @@ class MoveItIkDemo:
 
 if __name__ == "__main__":
 	demo = MoveItIkDemo()
-	point = [0.2, -0.45]
+	point = [-0.1, -0.46]
+	# demo.draw_line()
 	demo.draw_circle(point)
