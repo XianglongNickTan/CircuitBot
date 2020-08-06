@@ -12,8 +12,8 @@ import serial
 import os
 
 
-arduino_motor = serial.Serial('/dev/ttyACM0', 9600)
-arduino_voltage = serial.Serial('/dev/ttyACM1', 9600, timeout=0.5)
+arduino_motor = serial.Serial('/dev/ttyACM0', 38400)
+# arduino_voltage = serial.Serial('/dev/ttyACM1', 9600, timeout=0.5)
 
 
 
@@ -38,8 +38,9 @@ class MoveItIkDemo:
 		self.reference_frame = 'world'
 		self.arm.set_pose_reference_frame(self.reference_frame)
 
-		# 当运动规划失败后，允许重新规划
-		self.arm.allow_replanning(True)
+
+		# 当运动规划失败后，不允许重新规划
+		self.arm.allow_replanning(False)
 
 		# 设置位置(单位：米)和姿态（单位：弧度）的允许误差
 		self.arm.set_goal_position_tolerance(0.001)
@@ -54,12 +55,15 @@ class MoveItIkDemo:
 		scene = PlanningSceneInterface()
 		rospy.sleep(1)
 
+		# ws = [-0.3, -0.6, 0.01, 0.2, -0.3, 0.1]
+		# self.arm.set_workspace(ws)
+
 		# # 控制机械臂先回到初始化位置，手爪打开
 		# self.arm.set_named_target('Home')
 		# self.arm.go()
 		# # self.gripper.set_named_target('Open')
 		# # self.gripper.go()
-		rospy.sleep(1)
+		# rospy.sleep(1)
 
 		self.line_cont = 80
 		self.circle_cont = 40
@@ -67,8 +71,6 @@ class MoveItIkDemo:
 
 		self.target_pose = PoseStamped()
 		self.target_pose.header.frame_id = self.reference_frame
-		# self.target_pose.pose.position.x = 0
-		# self.target_pose.pose.position.y = -0.3
 		self.target_pose.pose.position.z = 0.03
 
 		self.target_pose.pose.orientation.x = 0.14578
@@ -76,27 +78,50 @@ class MoveItIkDemo:
 		self.target_pose.pose.orientation.z = -0.0085346
 		self.target_pose.pose.orientation.w = 0.0084136
 
-	def init_upright_path_constraints(self, pose):
+	# def init_upright_path_constraints(self, pose):
+	#
+	# 	self.upright_constraints = Constraints()
+	# 	self.upright_constraints.name = "upright"
+	# 	orientation_constraint = OrientationConstraint()
+	# 	orientation_constraint.header = pose.header
+	# 	orientation_constraint.link_name = self.end_effector_link
+	# 	orientation_constraint.orientation = pose.pose.orientation
+	# 	orientation_constraint.absolute_x_axis_tolerance = 0.2
+	# 	orientation_constraint.absolute_y_axis_tolerance = 0.2
+	# 	orientation_constraint.absolute_z_axis_tolerance = 0.2
+	# 	# orientation_constraint.absolute_z_axis_tolerance = 3.14 #ignore this axis
+	# 	orientation_constraint.weight = 1
+	#
+	# 	self.upright_constraints.orientation_constraints.append(orientation_constraint)
+	#
+	# def enable_upright_path_constraints(self):
+	# 	self.arm.set_path_constraints(self.upright_constraints)
+	#
+	# def disable_upright_path_constraints(self):
+	# 	self.arm.set_path_constraints(None)
 
-		self.upright_constraints = Constraints()
-		self.upright_constraints.name = "upright"
-		orientation_constraint = OrientationConstraint()
-		orientation_constraint.header = pose.header
-		orientation_constraint.link_name = self.end_effector_link
-		orientation_constraint.orientation = pose.pose.orientation
-		orientation_constraint.absolute_x_axis_tolerance = 0.2
-		orientation_constraint.absolute_y_axis_tolerance = 0.2
-		orientation_constraint.absolute_z_axis_tolerance = 0.2
-		# orientation_constraint.absolute_z_axis_tolerance = 3.14 #ignore this axis
-		orientation_constraint.weight = 1
 
-		self.upright_constraints.orientation_constraints.append(orientation_constraint)
-
-	def enable_upright_path_constraints(self):
-		self.arm.set_path_constraints(self.upright_constraints)
-
-	def disable_upright_path_constraints(self):
-		self.arm.set_path_constraints(None)
+	# def init_constraints(self, pose):
+	#
+	# 	self.constraints = Constraints()
+	# 	self.constraints.name = "vertical"
+	# 	orientation_constraint = OrientationConstraint()
+	# 	orientation_constraint.header = pose.header
+	# 	orientation_constraint.link_name = self.end_effector_link
+	# 	orientation_constraint.orientation = pose.pose.orientation
+	# 	orientation_constraint.absolute_x_axis_tolerance = 0.2
+	# 	orientation_constraint.absolute_y_axis_tolerance = 0.2
+	# 	orientation_constraint.absolute_z_axis_tolerance = 0.2
+	# 	# orientation_constraint.absolute_z_axis_tolerance = 3.14 #ignore this axis
+	# 	orientation_constraint.weight = 1
+	#
+	# 	self.upright_constraints.orientation_constraints.append(orientation_constraint)
+	#
+	# def enable_upright_path_constraints(self):
+	# 	self.arm.set_path_constraints(self.upright_constraints)
+	#
+	# def disable_upright_path_constraints(self):
+	# 	self.arm.set_path_constraints(None)
 
 
 	def move_to(self, point):
@@ -108,14 +133,14 @@ class MoveItIkDemo:
 		traj = self.arm.plan()
 		self.arm.execute(traj)
 
-	def send_voltage(self):
-		arduino_voltage.write('1')
-		voltage = arduino_voltage.readline()
-		self.voltage_file = open("voltage.txt", "w")
-		self.voltage_file.seek(0)
-		self.voltage_file.write(str(voltage))
-		self.voltage_file.write('\r\n')
-		self.voltage_file.close()
+	# def send_voltage(self):
+	# 	arduino_voltage.write('1')
+	# 	voltage = arduino_voltage.readline()
+	# 	self.voltage_file = open("voltage.txt", "w")
+	# 	self.voltage_file.seek(0)
+	# 	self.voltage_file.write(str(voltage))
+	# 	self.voltage_file.write('\r\n')
+	# 	self.voltage_file.close()
 
 	def draw_line(self, xy_init_pos=None):
 		waypoints = []
@@ -123,7 +148,7 @@ class MoveItIkDemo:
 		# 	xy_end_pos = [-0.2, -0.25]
 
 		if xy_init_pos is None:
-			xy_init_pos = [0.18, -0.47]
+			xy_init_pos = [0.18, -0.52]
 
 		self.target_pose.header.stamp = rospy.Time.now()
 		self.target_pose.pose.position.x = xy_init_pos[0]
@@ -172,9 +197,7 @@ class MoveItIkDemo:
 		self.arm.set_start_state_to_current_state()
 		self.arm.set_pose_target(self.target_pose, self.end_effector_link)
 		traj = self.arm.plan()
-		print "working"
 		self.arm.execute(traj)
-		print "me too"
 		rospy.sleep(2)
 
 
@@ -190,8 +213,8 @@ class MoveItIkDemo:
 			wpose.pose.position.y = xy_center_pos[1] + radius * np.sin(2 * np.pi * (t+1) / self.circle_cont)
 			waypoints.append(copy.deepcopy(wpose.pose))
 
-		self.init_upright_path_constraints(wpose)
-		self.enable_upright_path_constraints()
+		# self.init_upright_path_constraints(wpose)
+		# self.enable_upright_path_constraints()
 
 		(plan, fraction) = self.arm.compute_cartesian_path(
 			waypoints,
@@ -204,25 +227,14 @@ class MoveItIkDemo:
 		self.arm.execute(plan)
 		arduino_motor.write('0')
 
-		self.send_voltage()
+		# self.send_voltage()
 
-		self.disable_upright_path_constraints()
+		# self.disable_upright_path_constraints()
 		# rospy.sleep(2)
 
 
 		# moveit_commander.roscpp_shutdown()
 		# moveit_commander.os._exit(0)
-
-	def draw_circle_seqence(self):
-
-
-
-		for i in len(center_pos):
-			self.draw_circle(center_pos[i])
-
-		self.voltage_file.close()
-
-
 
 def test(xy_center_pos):
 	######################## For testing ########################
@@ -241,46 +253,26 @@ def test(xy_center_pos):
 
 if __name__ == "__main__":
 	demo = MoveItIkDemo()
-	# ###########################################################################
-	# points_file = open("next.txt", "r")
-	# points_str = points_file.read()
-	# # print(point_str)
-	# points_list = points_str.split()
-	# points_file.close()
-	# # os.remove("point.txt")
-	# # print(point_list)
-	#
-	#
-	# center1 = [float(points_list[0]), float(points_list[1])]
-	# center2 = [float(points_list[2]), float(points_list[3])]
-	# center3 = [float(points_list[4]), float(points_list[5])]
-	# demo.draw_circle(center1)
-	# demo.draw_circle(center2)
-	# demo.draw_circle(center3)
-	#
-	# points = [float(i) for i in points_list]
-	# # test(points)
-	# ###########################################################################
 
-	# demo.move_to([-0.05, -0.47])
-	demo.draw_circle([-0.16, -0.47])
-	demo.draw_circle([-0.08, -0.47])
-	demo.draw_circle([0.0, -0.47])
-	demo.draw_circle([0.8, -0.47])
+	demo.draw_line()
 
-# demo.draw_circle([0.05, -0.4], 0.05)
-	# demo.draw_circle([-0.05, -0.4], 0.05)
-	# demo.draw_circle([-0.15, -0.4], 0.05)
+	rospy.sleep(10)
+	###########################################################################
+	points_file = open("next.txt", "r")
+	points_str = points_file.read()
+	# print(point_str)
+	points_list = points_str.split()
+	points_file.close()
+	# os.remove("point.txt")
+	# print(point_list)
 
+	#################################################################
 
+	center1 = [float(points_list[0]), float(points_list[3])-0.05]
+	center2 = [float(points_list[1]), float(points_list[4])-0.05]
+	center3 = [float(points_list[2]), float(points_list[5])-0.05]
+	demo.draw_circle(center1)
+	demo.draw_circle(center2)
+	demo.draw_circle(center3)
 
-	######################## For testing ########################
-	# for i in range (4):
-	# 	point = [0.2 - i*0.1, -0.58 + i * 0.06]
-	# 	demo.draw_circle(point)
-
-	# for _ in range(10):
-	# 		demo.draw_line()
-	# 	# demo.draw_line()
-	# demo.draw_line()
-	#
+	# demo.draw_circle([-0.2, -0.6])

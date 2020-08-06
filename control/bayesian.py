@@ -15,7 +15,7 @@ from bayes_opt import UtilityFunction
 def circuitBot():
     optimizer = BayesianOptimization(
         f=None,
-        pbounds={'x1': (-0.15, 0.05), 'y1': (-0.55, -0.4), 'x2': (-0.15, 0.05), 'y2': (-0.55, -0.4), 'x3': (-0.15, 0.05), 'y3': (-0.55, -0.4)},
+        pbounds={'x1': (-0.21, 0.1), 'y1': (-0.55, -0.4), 'x2': (-0.21, 0.1), 'y2': (-0.55, -0.4), 'x3': (-0.21, 0.1), 'y3': (-0.55, -0.4)},
         verbose=2,  # choices: 0, 1, 2
         random_state=1,
         # bounds_transformer = SequentialDomainReductionTransformer()
@@ -27,16 +27,19 @@ def circuitBot():
     utility = UtilityFunction(kind="ucb", kappa=2, xi=0.0)
     
     # To output paramters and voltage as a csv file
-    name = ['x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'voltage1', 'voltage2', 'voltage3']
+    name = ['x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'voltage']
     csv_list = []
 
     # train part
     for _ in range(10):
         next_to_probe = optimizer.suggest(utility) # A dict to tell you the next parameters to probe
+        print(next_to_probe)
 
         point_file = open("next.txt", "w")
         point_str = str()
         for key in next_to_probe:
+            print (key)
+            print(next_to_probe[key])
             point_str += str(next_to_probe[key])
             point_str += " "
         print(point_str)
@@ -57,23 +60,20 @@ def circuitBot():
                 break
 
         voltage_file = open("voltage.txt", "r")
-        voltage_str = voltage_file.read()
-        voltage_list = voltage_str.split()
+        voltage = voltage_file.read()
         voltage_file.close()
         os.remove("voltage.txt")
 
         optimizer.register(
             params=next_to_probe,
-            target=float(voltage_list[-1])
+            target=float(voltage)
         )
 
         # To record these parameter and voltage
         tmp = []
         for key in next_to_probe:
             tmp.append(next_to_probe[key])
-        tmp.append(float(voltage_list[0]))
-        tmp.append(float(voltage_list[1]))
-        tmp.append(float(voltage_list[2]))
+        tmp.append(float(voltage))
         csv_list.append(tmp)
 
     csv = pd.DataFrame(columns=name, data=csv_list)
