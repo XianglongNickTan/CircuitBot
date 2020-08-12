@@ -1,0 +1,24 @@
+range of x: -0.3, 0.2
+range of y: -0.6, -0.3
+
+
+##############################################################
+August 4th:
+Centers of 3 circles
+Number of variables :6
+
+position of line:
+x:0.2 -> -0.26
+y:-0.52
+
+when radius equals to 0.05:
+range of center_x: -0.18, 0.12
+range of center_y: -0.6, -0.45
+
+voltage:
+line 	12
+circle 	9
+
+nuzzle:		1/8
+
+messure:	42cm
