@@ -10,16 +10,21 @@ void setup(){
 
 
 void loop(){
-	if(Serial.available()>0)
-	{
-		readIn = Serial.read();
-	}
+  if(Serial.available()>0)
+  {
+    readIn = Serial.read();
+  }
 
-	if(readIn == '1') {
-		digitalWrite(potEnable, HIGH);
-	}
+  if(readIn == '1') {
+    delay(1000);
+    digitalWrite(potEnable, HIGH);
+  }
 
-	else if(readIn == '0'){
-		digitalWrite(potEnable, LOW);
-	}
+  else if(readIn == '0'){
+    digitalWrite(potEnable, LOW);
+  }
+
+  else if(readIn == '2'){
+    digitalWrite(potEnable, HIGH);
+  }
 }

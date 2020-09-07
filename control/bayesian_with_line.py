@@ -8,19 +8,17 @@ from bayes_opt import UtilityFunction
 from bayes_opt.logger import JSONLogger
 from bayes_opt.event import Events
 from bayes_opt.util import load_logs
-from collections import namedtuple
 
-import csv
-from pandas.core.frame import DataFrame
+# from bayes_opt import SequentialDomainReductionTransformer
 
-
-
-# df = pd.DataFrame(tmp_lst[1:], columns=tmp_lst[0])
-# print(df)
-
+# Bound region of parameter space
+# For now, we have 6 parameters. The range of x is (-0.21, 0.1), the range of y is (-0.55, -0.4)
 xybounds = {'x1': (-0.18, 0.12), 'y1': (-0.6, -0.45), 'x2': (-0.18, 0.12), 'y2': (-0.6, -0.45), 'x3': (-0.18, 0.12), 'y3': (-0.6, -0.45)}
 # Times of experiment
 times_of_experiments = 10
+
+
+
 
 def circuitBot():
     optimizer = BayesianOptimization(
@@ -38,15 +36,11 @@ def circuitBot():
     optimizer.subscribe(Events.OPTIMIZATION_STEP, logger)
 
     utility = UtilityFunction(kind="ucb", kappa=2, xi=0.0)
-
-    point = namedtuple('point', ['x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'voltage'])
-
-    Point = []
-
-
+    
     # To output paramters and voltage as a csv file
     name = ['x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'voltage']
     csv_list = []
+
 
     # pretrainning part
     probe1 = {'x1': 0.12, 'y1': -0.52, 'x2': -0.03, 'y2': -0.52, 'x3': -0.18, 'y3': -0.52}
@@ -63,16 +57,64 @@ def circuitBot():
     for j in range(9):
         optimizer.register(params=probes[j], target=results[j])
 
-    with open('data.csv', 'r') as f:
-        reader = csv.reader(f)
-        for row in reader:
-            Point.append(point(row[1:]))
+    # train part
+    for i in range(20):
+        next_to_probe = optimizer.suggest(utility) # A dict to tell you the next parameters to probe
+        print(next_to_probe)
+        # 将连续值变为离散值
+        for item in next_to_probe:
+            next_to_probe[item] = round(next_to_probe[item], 2)
+        point_file = open("next.txt", "w")
+        point_str = str()
+        for key in next_to_probe:
+            print (key)
+            print(next_to_probe[key])
+            point_str += str(next_to_probe[key])
+            point_str += " "
+        print(point_str)
+        point_file.write(point_str)
+        point_file.close()
 
-    print(Point)
+        print("Now, change to the other terminal to let robot arm draw.")
+        # print("Press q when it finished.")
 
-    next_to_probe = optimizer.suggest(utility)
+        ###################################################
+        # Now we should wait the robot arm draw circle
+        # Pass q when the robot arm finished
+        ###################################################
 
-    # print(next_to_probe)
+        # keyboard.wait("q")
+        while True:
+            if input("Press q when it finished:") == "q":
+                break
+
+        voltage_file = open("voltage.txt", "r")
+        voltage = voltage_file.read()
+        voltage_file.close()
+
+        try:
+            optimizer.register(
+                params=next_to_probe,
+                target=float(voltage)
+            )
+        except KeyError:
+            next_to_probe['x1'] = next_to_probe['x1'] + random.randint(1, 1000)*0.001
+            optimizer.register(
+                params=next_to_probe,
+                target=float(voltage)
+            )
+        # To record these parameter and voltage
+        tmp = []
+        for key in next_to_probe:
+            tmp.append(next_to_probe[key])
+        tmp.append(float(voltage))
+        csv_list.append(tmp)
+
+    csv = pd.DataFrame(columns=name, data=csv_list)
+    output_file = "data.csv"
+    csv.to_csv(output_file)
+
+
 
 if __name__ == "__main__":
     circuitBot()

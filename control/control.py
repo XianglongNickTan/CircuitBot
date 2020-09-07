@@ -67,7 +67,8 @@ class MoveItIkDemo:
 
 		self.line_cont = 80
 		self.circle_cont = 40
-		self.radius = 0.10
+		self.square_cont = 10
+		self.triangle_cont = 10
 
 		self.target_pose = PoseStamped()
 		self.target_pose.header.frame_id = self.reference_frame
@@ -155,8 +156,128 @@ class MoveItIkDemo:
 
 		rospy.sleep(10)
 
+	def draw_square(self, xy_center_pos, length=0.05, orientation=0):
+		waypoints = []
+		# rospy.rostime.wallsleep(0.05)
 
-	def draw_circle(self, xy_center_pos, radius = 0.05):
+		self.target_pose.header.stamp = rospy.Time.now()
+		self.target_pose.pose.position.x = xy_center_pos[0] + length
+		self.target_pose.pose.position.y = xy_center_pos[1] - length
+		self.arm.set_start_state_to_current_state()
+		self.arm.set_pose_target(self.target_pose, self.end_effector_link)
+		traj = self.arm.plan()
+		self.arm.execute(traj)
+		rospy.sleep(2)
+
+
+		wpose = self.arm.get_current_pose()
+		wpose.pose.orientation.x = 0.14578
+		wpose.pose.orientation.y = 0.98924
+		wpose.pose.orientation.z = -0.00853
+		wpose.pose.orientation.w = 0.00841
+		wpose.pose.position.z = 0.03
+
+		for _ in range (3):
+			for t in range(self.square_cont):
+				wpose.pose.position.x = (xy_center_pos[0] + length - 2 * length / self.square_cont * (t + 1))
+				wpose.pose.position.y = xy_center_pos[1] - length
+				waypoints.append(copy.deepcopy(wpose.pose))
+			for t in range(self.square_cont):
+				wpose.pose.position.x = xy_center_pos[0] - length
+				wpose.pose.position.y = (xy_center_pos[1] - length + 2 * length / self.square_cont * (t + 1))
+				waypoints.append(copy.deepcopy(wpose.pose))
+			for t in range(self.square_cont):
+				wpose.pose.position.x = (xy_center_pos[0] - length + 2 * length / self.square_cont * (t + 1))
+				wpose.pose.position.y = xy_center_pos[1] + length
+				waypoints.append(copy.deepcopy(wpose.pose))
+			for t in range(self.square_cont):
+				wpose.pose.position.x = xy_center_pos[0] + length
+				wpose.pose.position.y = (xy_center_pos[1] + length - 2 * length / self.square_cont * (t + 1))
+				waypoints.append(copy.deepcopy(wpose.pose))
+
+		# self.init_upright_path_constraints(wpose)
+		# self.enable_upright_path_constraints()
+
+		(plan, fraction) = self.arm.compute_cartesian_path(
+			waypoints,
+			# 0.0005,             # SUPER IMPORTANT PARAMETER FOR VELOCITY CONTROL !!!!!
+			0.01,  # SUPER IMPORTANT PARAMETER FOR VELOCITY CONTROL !!!!!
+			0.0
+		)
+
+		arduino_motor.write('1')
+		self.arm.execute(plan)
+		arduino_motor.write('0')
+		self.arm.stop()
+		rospy.sleep(2)
+
+	def draw_triangle(self, xy_center_pos, length=0.05, orientation=0):
+		waypoints = []
+		# rospy.rostime.wallsleep(0.05)
+
+		self.target_pose.header.stamp = rospy.Time.now()
+		self.target_pose.pose.position.x = xy_center_pos[0] + length
+		self.target_pose.pose.position.y = xy_center_pos[1] - length
+		self.arm.set_start_state_to_current_state()
+		self.arm.set_pose_target(self.target_pose, self.end_effector_link)
+		traj = self.arm.plan()
+		self.arm.execute(traj)
+		rospy.sleep(2)
+
+
+		wpose = self.arm.get_current_pose()
+		wpose.pose.orientation.x = 0.14578
+		wpose.pose.orientation.y = 0.98924
+		wpose.pose.orientation.z = -0.00853
+		wpose.pose.orientation.w = 0.00841
+		wpose.pose.position.z = 0.03
+
+		point_1 = [xy_center_pos[0], xy_center_pos[1] - length * 2 * np.sqrt(3) / 3]
+		point_2 = [xy_center_pos[0] - length, xy_center_pos[1] + length * np.sqrt(3) / 3]
+		point_3 = [xy_center_pos[0] + length, xy_center_pos[1] + length * np.sqrt(3) / 3]
+
+		for _ in range (3):
+			wpose.pose.position.x = point_1[0]
+			wpose.pose.position.y = point_1[1]
+			waypoints.append(copy.deepcopy(wpose.pose))
+			wpose.pose.position.x = (point_1[0] + point_2[0]) / 2
+			wpose.pose.position.y = (point_1[1] + point_2[1]) / 2
+			waypoints.append(copy.deepcopy(wpose.pose))
+			wpose.pose.position.x = point_2[0]
+			wpose.pose.position.y = point_2[1]
+			waypoints.append(copy.deepcopy(wpose.pose))
+			wpose.pose.position.x = (point_2[0] + point_3[0]) / 2
+			wpose.pose.position.y = (point_2[1] + point_3[1]) / 2
+			waypoints.append(copy.deepcopy(wpose.pose))
+			wpose.pose.position.x = point_3[0]
+			wpose.pose.position.y = point_3[1]
+			waypoints.append(copy.deepcopy(wpose.pose))
+			wpose.pose.position.x = (point_3[0] + point_1[0]) / 2
+			wpose.pose.position.y = (point_3[1] + point_1[1]) / 2
+			waypoints.append(copy.deepcopy(wpose.pose))
+			wpose.pose.position.x = point_1[0]
+			wpose.pose.position.y = point_1[1]
+			waypoints.append(copy.deepcopy(wpose.pose))
+
+
+		# self.init_upright_path_constraints(wpose)
+		# self.enable_upright_path_constraints()
+
+		(plan, fraction) = self.arm.compute_cartesian_path(
+			waypoints,
+			# 0.0005,             # SUPER IMPORTANT PARAMETER FOR VELOCITY CONTROL !!!!!
+			0.001,  # SUPER IMPORTANT PARAMETER FOR VELOCITY CONTROL !!!!!
+			0.0
+		)
+
+		arduino_motor.write('1')
+		self.arm.execute(plan)
+		arduino_motor.write('0')
+		self.arm.stop()
+		rospy.sleep(2)
+
+
+	def draw_circle(self, xy_center_pos, radius = 0.06):
 		waypoints = []
 		# rospy.rostime.wallsleep(0.05)
 
@@ -224,60 +345,25 @@ def test(xy_center_pos):
 if __name__ == "__main__":
 	demo = MoveItIkDemo()
 	#
-	demo.draw_line()
+	# demo.draw_triangle([0, -0.52])
+	demo.draw_square([-0.15, -0.52])
+	demo.draw_circle([])
 
-	###########################################################################
-	points_file = open("next.txt", "r")
-	points_str = points_file.read()
-	print(points_str)
-	points_list = points_str.split()
-	points_file.close()
-
-	#################################################################
-
-	center1 = [float(points_list[0]), float(points_list[3])]
-	center2 = [float(points_list[1]), float(points_list[4])]
-	center3 = [float(points_list[2]), float(points_list[5])]
-	demo.draw_circle(center1)
-	demo.draw_circle(center2)
-	demo.draw_circle(center3)
-
-	# demo.draw_circle([-0.08, -0.6])
-
-	# demo.draw_circle([0.12, -0.52])
-	# demo.draw_circle([-0.03, -0.52])
-	# demo.draw_circle([-0.18, -0.52])
-	# #
-	# demo.draw_circle([0.07, -0.52])
-	# demo.draw_circle([-0.03, -0.52])
-	# demo.draw_circle([-0.13, -0.52])
-	#
-	# demo.draw_circle([0, -0.45])
-	# demo.draw_circle([-0.03, -0.52])
-	# demo.draw_circle([-0.1, -0.52])
-
-	moveit_commander.roscpp_shutdown()
-	moveit_commander.os._exit(0)
-
-	# demo.draw_line()
-	#
-	# rospy.sleep(10)
 	# ###########################################################################
 	# points_file = open("next.txt", "r")
 	# points_str = points_file.read()
-	# # print(point_str)
+	# print(points_str)
 	# points_list = points_str.split()
 	# points_file.close()
-	# # os.remove("point.txt")
-	# # print(point_list)
 	#
 	# #################################################################
 	#
-	# center1 = [float(points_list[0]), float(points_list[3])-0.05]
-	# center2 = [float(points_list[1]), float(points_list[4])-0.05]
-	# center3 = [float(points_list[2]), float(points_list[5])-0.05]
+	# center1 = [float(points_list[0]), float(points_list[3])]
+	# center2 = [float(points_list[1]), float(points_list[4])]
+	# center3 = [float(points_list[2]), float(points_list[5])]
 	# demo.draw_circle(center1)
 	# demo.draw_circle(center2)
 	# demo.draw_circle(center3)
 
-	# demo.draw_circle([-0.2, -0.6])
+	moveit_commander.roscpp_shutdown()
+	moveit_commander.os._exit(0)
