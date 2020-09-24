@@ -29,13 +29,15 @@ messure:	42cm
 #############################################################
 no line
 
-when radius equals to 0.06:
-range of center_x: -0.15, 0.09
-range of center_y: -0.6, -0.46
+when radius equals to 0.05:
+range of center_x: -0.16, 0.08
+range of center_y: -0.58, -0.48
 
+x_offset = -0.04
+y_offset = -0.53
 
-bar1_x : 0.12
-bar2_x : -0.18
+bar1_x : 0.09
+bar2_x : -0.17
 
 voltage:
 line 	12
@@ -44,3 +46,20 @@ circle 	9
 nuzzle:		1/8
 
 messure:	30cm
+
+resistance:	45ohms
+
+shape_size
+line:		10cm
+cross:		width=10cm
+circle:		radius=5cm
+diamond:	diagonal=12cm
+triangle:	middleline = 9cm
+
+
+
+
+
+
+
+
