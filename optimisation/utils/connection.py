@@ -20,11 +20,17 @@ def draw_shape(indicator, xy_center_pos, size=5):
 
     elif indicator == 1:  # ver_line
         p = LineString([(xy_center_pos[0], xy_center_pos[1] - size), (xy_center_pos[0], xy_center_pos[1] + size)])
+        # p = LineString([(xy_center_pos[0] - size, xy_center_pos[1]), (xy_center_pos[0] + size, xy_center_pos[1])])
+        # p = Point(xy_center_pos[0], xy_center_pos[1]).buffer(size)
+
 
     elif indicator == 2:  # cross
-        p = MultiLineString(
-            [((xy_center_pos[0] + size, xy_center_pos[1] + size), (xy_center_pos[0] - size, xy_center_pos[1] - size)),
-             ((xy_center_pos[0] - size, xy_center_pos[1] + size), (xy_center_pos[0] + size, xy_center_pos[1] - size))])
+        # p = MultiLineString(
+        #     [((xy_center_pos[0] + size, xy_center_pos[1] + size), (xy_center_pos[0] - size, xy_center_pos[1] - size)),
+        #      ((xy_center_pos[0] - size, xy_center_pos[1] + size), (xy_center_pos[0] + size, xy_center_pos[1] - size))])
+        p = Point(xy_center_pos[0], xy_center_pos[1]).buffer(size)
+
+
 
     elif indicator == 3:  # circle
         p = Point(xy_center_pos[0], xy_center_pos[1]).buffer(size)
@@ -44,6 +50,9 @@ def draw_shape(indicator, xy_center_pos, size=5):
         point_4 = (xy_center_pos[0], xy_center_pos[1] + size)      
         p = Polygon([point_1, point_2, point_3, point_4])
 
+    else:
+        raise NotImplementedError
+
     return p
 
 
@@ -54,8 +63,11 @@ def check_connection(state_list, shape_num=shape_num, bar1_x=bar1_x, bar2_x=bar2
     all_connect = False
     shape = []
 
-    bar1 = draw_shape(1, [bar1_x, 0], size=13)
-    bar2 = draw_shape(1, [bar2_x, 0], size=13)
+    bar1 = LineString([(bar1_x, -13), (bar1_x, 13)])
+    bar2 = LineString([(bar2_x, -13), (bar2_x, 13)])
+
+    # bar1 = draw_shape(1, [bar1_x, 0], size=13)
+    # bar2 = draw_shape(1, [bar2_x, 0], size=13)
 
     if multi_shape:
         shape_list = state_list[0:shape_num]

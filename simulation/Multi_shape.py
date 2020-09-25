@@ -18,9 +18,9 @@ from shapely.geometry import Point, LineString, Polygon, MultiLineString
 # For now, we have 6 parameters. The range of x is (-0.21, 0.1), the range of y is (-0.55, -0.4)
 
 
-xybounds = {'s1': (0, 5), 'x1': (-12, -9), 'y1': (-5, 5), 's2': (0, 5), 'x2': (-9, -3), 'y2': (-5, 5),
-            's3': (0, 5), 'x3': (-3, 3), 'y3': (-5, 5), 's4': (0, 5), 'x4': (3, 9), 'y4': (-5, 5),
-            's5': (0, 5), 'x5': (7, 12), 'y5': (-5, 5)}
+xybounds = {'s1': (0, 5), 'x1': (-12, -9), 'y1': (-2, 2), 's2': (0, 5), 'x2': (-8, -4), 'y2': (-2, 2),
+            's3': (0, 5), 'x3': (-2, 2), 'y3': (-2, 2), 's4': (0, 5), 'x4': (4, 8), 'y4': (-2, 2),
+            's5': (0, 5), 'x5': (9, 12), 'y5': (-2, 2)}
 
 # xybounds = {'s1': (0, 5), 'x1': (-12, 12), 'y1': (-5, 5), 's2': (0, 5), 'x2': (-12, 12), 'y2': (-5, 5),
 #             's3': (0, 5), 'x3': (-12, 12), 'y3': (-5, 5), 's4': (0, 5), 'x4': (-12, 12), 'y4': (-5, 5),
@@ -35,6 +35,7 @@ def draw_shape(indicator, xy_center_pos, size=5):
 
     elif indicator == 1:  # ver_line
         p = LineString([(xy_center_pos[0], xy_center_pos[1] - size), (xy_center_pos[0], xy_center_pos[1] + size)])
+        # p = LineString([(xy_center_pos[0] - size, xy_center_pos[1]), (xy_center_pos[0] + size, xy_center_pos[1])])
 
     elif indicator == 2:  # cross
         p = MultiLineString(
@@ -217,12 +218,15 @@ def circuitBot():
             state = ""
             for i in range(5):
                 state += str(state_list[i])
+                state += ','
                 state += ' '
 
             for j in range(5):
                 state += str(state_list[j+5])
+                state += ','
                 state += ' '
                 state += str(state_list[j+10])
+                state += ','
                 state += ' '
 
             parameter.append(state)

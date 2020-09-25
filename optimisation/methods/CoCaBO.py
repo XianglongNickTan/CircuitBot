@@ -86,6 +86,8 @@ class CoCaBO(CoCaBO_Base):
 
             self.ht_recommedations.append(ht_list)
 
+            # print(Wc_list)
+
         df = pd.DataFrame(result_list, columns=["iter", "ht", "Reward",
                                                 "best_value", "mix_val",
                                                 "model_hp"])
@@ -172,6 +174,7 @@ class CoCaBO(CoCaBO_Base):
         # print(f'arm pulled={ht_next_list[:]} ; rewards = {ht_list_rewards[:]};'
         #       f' y_best = {bestval_ht}; mix={self.mix_used}')
         print(f'arm pulled={ht_next_list[:]}; y_best = {bestval_ht}; mix={self.mix_used}')
+        print(z_next)
 
         return ht_list_rewards
 

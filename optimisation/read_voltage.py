@@ -8,7 +8,48 @@
 
 import numpy as np
 from utils.connection import check_connection
+from collections import Counter
+import random
 
+
+def read_voltage_simulation(x):
+    state_list = []
+    point_str = str()
+
+    for item in x:
+        # x[item] = round(x[item])
+        state_list.append(item)
+
+    # seed = int(np.round((np.random.random() + 1) * 100))
+
+    # np.random.seed(108)
+    # random.seed(108)
+
+    hor_line = state_list.count(0)
+    ver_line = state_list.count(1)
+    cross = state_list.count(2)
+    circle = state_list.count(3)
+    triangle = state_list.count(4)
+    diamond = state_list.count(5)
+
+    if check_connection(state_list, multi_shape=True):
+        # voltage = hor_line * 20 + ver_line *1 + cross *30 + circle *100 + triangle * 10 + diamond * 50
+        # if ver_line == 0:
+        #     voltage = 100
+        #     result = -voltage
+        #
+        # else:
+        #     result = 100
+
+        result = -100
+
+        print('connected')
+
+    else:
+        result = 0.0
+        print('no connection')
+
+    return result
 
 def read_voltage(x):
     state_list = []

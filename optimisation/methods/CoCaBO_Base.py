@@ -22,7 +22,7 @@ class CoCaBO_Base(BaseBO):
 
     def __init__(self, objfn, initN, bounds, acq_type, C,
                  kernel_mix=0.5, mix_lr=10,
-                 model_update_interval=10,
+                 model_update_interval=1,
                  ard=False, **kwargs):
         super().__init__(objfn, initN, bounds, C, **kwargs)
         self.acq_type = acq_type
@@ -97,34 +97,39 @@ class CoCaBO_Base(BaseBO):
             self.trial_num = i
             # np.random.seed(i)
             # random.seed(i)
+            #
+            # probe1 = [2, 2, 5, 1, 2, 8, 1, -11, 1, 3, -3, -9, -3, -7, 2]
+            # probe2 = [2, 2, 4, 3, 3, 6, 3, -2, 2, -8, -4, -9, 4, 9, -2]
+            # probe3 = [2, 4, 4, 2, 3, 8, 3, -1, 3, -10, -2, -5, -2, 3, 4]
+            # probe4 = [4, 5, 2, 1, 5, -5, -4, -2, -3, -10, 0, -7, -3, 7, -2]
+            # probe5 = [4, 3, 1, 0, 2, -8, 5, 5, 4, 7, 1, 12, -2, -3, 3]
+            # probe6 = [5, 4, 3, 3, 4, 11, -3, 6, -5, -9, -1, 3, 2, 0, -1]
+            # probe7 = [3, 3, 2, 4, 0, 11, -4, -8, 0, 1, 0, -2, -2, 8, -2]
+            # probe8 = [3, 4, 3, 0, 2, 8, 3, -8, 4, -3, 2, -1, -4, 5, 5]
+            # probe9 = [2, 3, 3, 3, 3, 6, -1, -8, 1, 8, 3, 0, 4, -6, 4]
+            # probe10 = [5, 2, 2, 2, 5, -1, 3, -12, -1, 9, 2, -5, -3, 11, 3]
+            # probe11 = [3, 0, 3, 4, 4, -11, 2, -7, 3, 9, 3, 1, 4, 7, -2]
+            # probe12 = [5, 4, 2, 3, 3, 7, 1, 3, 1, -5, 4, -7, -3, -11, 0]
+            # probe13 = [3, 2, 2, 4, 5, 9, 0, -6, -2, 2, 0, 1, 2, -7, -3]
+            # probe14 = [5, 2, 3, 3, 2, -2, 5, 3, -1, 5, 1, -10, 4, 12, 2]
+            # probe15 = [1, 3, 3, 5, 0, 1, -5, -2, 0, -10, 2, 8, -4, -2, -3]
+            # probe16 = [2, 4, 3, 3, 2, -8, 2, -4, 1, 3, -2, 5, 5, 9, 0]
+            # probe17 = [5, 2, 4, 4, 4, 9, -5, -12, -5, -10, -4, 2, 0, -5, 2]
+            # probe18 = [5, 3, 1, 0, 4, 8, 0, -8, 0, 8, 3, -6, 4, 1, 3]
+            # probe19 = [4, 4, 0, 4, 5, -8, 3, 0, -2, -1, 2, -10, 1, 8, 0]
+            # probe20 = [3, 1, 3, 3, 0, -12, -1, -7, -1, 8, -2, 0, -3, -7, 0]
+            # initData = [probe1, probe2, probe3, probe4, probe5, probe6, probe7, probe8, probe9, probe10,
+            #     probe11, probe12, probe13, probe14, probe15, probe16, probe17, probe18, probe19, probe20]
+            # initData = [np.array(initData)]
 
-            probe1 = [2, 2, 5, 1, 2, 8, 1, -11, 1, 3, -3, -9, -3, -7, 2]
-            probe2 = [2, 2, 4, 3, 3, 6, 3, -2, 2, -8, -4, -9, 4, 9, -2]
-            probe3 = [2, 4, 4, 2, 3, 8, 3, -1, 3, -10, -2, -5, -2, 3, 4]
-            probe4 = [4, 5, 2, 1, 5, -5, -4, -2, -3, -10, 0, -7, -3, 7, -2]
-            probe5 = [4, 3, 1, 0, 2, -8, 5, 5, 4, 7, 1, 12, -2, -3, 3]
-            probe6 = [5, 4, 3, 3, 4, 11, -3, 6, -5, -9, -1, 3, 2, 0, -1]
-            probe7 = [3, 3, 2, 4, 0, 11, -4, -8, 0, 1, 0, -2, -2, 8, -2]
-            probe8 = [3, 4, 3, 0, 2, 8, 3, -8, 4, -3, 2, -1, -4, 5, 5]
-            probe9 = [2, 3, 3, 3, 3, 6, -1, -8, 1, 8, 3, 0, 4, -6, 4]
-            probe10 = [5, 2, 2, 2, 5, -1, 3, -12, -1, 9, 2, -5, -3, 11, 3]
-            probe11 = [3, 0, 3, 4, 4, -11, 2, -7, 3, 9, 3, 1, 4, 7, -2]
-            probe12 = [5, 4, 2, 3, 3, 7, 1, 3, 1, -5, 4, -7, -3, -11, 0]
-            probe13 = [3, 2, 2, 4, 5, 9, 0, -6, -2, 2, 0, 1, 2, -7, -3]
-            probe14 = [5, 2, 3, 3, 2, -2, 5, 3, -1, 5, 1, -10, 4, 12, 2]
-            probe15 = [1, 3, 3, 5, 0, 1, -5, -2, 0, -10, 2, 8, -4, -2, -3]
-            probe16 = [2, 4, 3, 3, 2, -8, 2, -4, 1, 3, -2, 5, 5, 9, 0]
-            probe17 = [5, 2, 4, 4, 4, 9, -5, -12, -5, -10, -4, 2, 0, -5, 2]
-            probe18 = [5, 3, 1, 0, 4, 8, 0, -8, 0, 8, 3, -6, 4, 1, 3]
-            probe19 = [4, 4, 0, 4, 5, -8, 3, 0, -2, -1, 2, -10, 1, 8, 0]
-            probe20 = [3, 1, 3, 3, 0, -12, -1, -7, -1, 8, -2, 0, -3, -7, 0]
-            initData = [probe1, probe2, probe3, probe4, probe5, probe6, probe7, probe8, probe9, probe10,
-                probe11, probe12, probe13, probe14, probe15, probe16, probe17, probe18, probe19, probe20]
+            initData = [[0.0, 4.0, 4.0, 4.0, 0.0, -11.0, 1.0, -7.0, 1.0, 1.0, 1.0, 6.0, 0.0, 10.0, 1.0]]
             initData = [np.array(initData)]
 
+            # initResult = [13.2, 16.5, 18.9, 18.9, 13.9, 18.5, 18.4, 17.3, 17.7, 18.2,
+            #     17.5, 18.5, 19.9, 18.0, 18.1, 18.8, 18.8, 18.5, 20.2, 16.3]
 
-            initResult = [13.2, 16.5, 18.9, 18.9, 13.9, 18.5, 18.4, 17.3, 17.7, 18.2,
-                17.5, 18.5, 19.9, 18.0, 18.1, 18.8, 18.8, 18.5, 20.2, 16.3]
+            initResult = [0]
+
             for i in range(len(initResult)):
                 initResult[i] = [-initResult[i]]
 
@@ -200,7 +205,7 @@ class CoCaBO_Base(BaseBO):
             C = self.C_list[j]
             gamma = gamma_list[j]
             probabilityDistribution = probabilityDistribution_list[j]
-            # print(f'cat_var={j}, prob={probabilityDistribution}')
+            print(f'cat_var={j}, prob={probabilityDistribution}')
 
             if batch_size > 1:
                 ht_batch_list = ht_batch_list.astype(int)
