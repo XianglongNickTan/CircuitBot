@@ -64,11 +64,19 @@ class CoCaBO(CoCaBO_Base):
                                                     batch_size)
 
             # Get reward for multi-armed bandit
-            Gt_ht_list = self.RewardperCategoryviaBO(self.f, ht_list,
+            Gt_ht_list, x_list, z_list, y_list = self.RewardperCategoryviaBO(self.f, ht_list,
                                                      categorical_dims,
                                                      continuous_dims,
                                                      self.bounds,
                                                      self.acq_type, b)
+
+            y_list = y_list * -1
+
+            line = ht_list.count(0)
+            circle = ht_list.count(1)
+            cross = ht_list.count(2)
+            triangle = ht_list.count(3)
+            diamond = ht_list.count(4)
 
             # Update the reward and the weight
             Wc_list = self.update_weights_for_all_cat_var(
@@ -81,16 +89,15 @@ class CoCaBO(CoCaBO_Base):
             besty, li, vi = self.getBestVal2(self.result)
 
             # Store the results of this iteration
-            result_list.append([t, ht_list, Gt_ht_list, besty, self.mix_used,
+            result_list.append([t, ht_list, x_list, z_list, line, circle, y_list, Gt_ht_list, besty,
                                 self.model_hp])
 
             self.ht_recommedations.append(ht_list)
 
-            # print(Wc_list)
+            # print(Gt_ht_list)
 
-        df = pd.DataFrame(result_list, columns=["iter", "ht", "Reward",
-                                                "best_value", "mix_val",
-                                                "model_hp"])
+        df = pd.DataFrame(result_list, columns=["iter", "ht", "xt", "zt", "line_num", "circle_num", "value", "Reward",
+                                                "best_value", "model_hp"])
         bestx = self.data[li][vi]
         self.best_val_list.append([batch_size, self.trial_num, li, besty,
                                    bestx])
@@ -147,9 +154,9 @@ class CoCaBO(CoCaBO_Base):
         res = sample_then_minimize(
             optimiser_func,
             x_bounds,
-            num_samples=5000,
-            num_chunks=10,
-            num_local=3,
+            num_samples=2,
+            num_chunks=2,
+            num_local=2,
             evaluate_sequentially=False)
 
         x_next = res.x
@@ -173,10 +180,12 @@ class CoCaBO(CoCaBO_Base):
 
         # print(f'arm pulled={ht_next_list[:]} ; rewards = {ht_list_rewards[:]};'
         #       f' y_best = {bestval_ht}; mix={self.mix_used}')
-        print(f'arm pulled={ht_next_list[:]}; y_best = {bestval_ht}; mix={self.mix_used}')
-        print(z_next)
+        # print(f'arm pulled={ht_next_list[:]}; y_best = {bestval_ht}; mix={self.mix_used}')
+        # print(f'arm pulled={ht_next_list[:]}; y_best = {bestval_ht}')
+        print(f'y_best = {bestval_ht}')
+        # print(z_next)
 
-        return ht_list_rewards
+        return ht_list_rewards, x_next, z_next, y_next
 
     def get_kernel(self, categorical_dims, continuous_dims):
         # create surrogate

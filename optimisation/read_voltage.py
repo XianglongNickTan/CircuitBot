@@ -32,16 +32,16 @@ def read_voltage_simulation(x):
     triangle = state_list.count(4)
     diamond = state_list.count(5)
 
-    if check_connection(state_list, multi_shape=True):
-        # voltage = hor_line * 20 + ver_line *1 + cross *30 + circle *100 + triangle * 10 + diamond * 50
+    if check_connection(state_list):
+        # voltage = ver_line *100
         # if ver_line == 0:
         #     voltage = 100
         #     result = -voltage
         #
         # else:
         #     result = 100
-
-        result = -100
+        voltage = 100
+        result = -voltage
 
         print('connected')
 
@@ -51,7 +51,35 @@ def read_voltage_simulation(x):
 
     return result
 
-def read_voltage(x):
+def read_voltage_line_circle(x):
+    point_str = str()
+
+    for item in x:
+        point_str += str(item)
+        point_str += " "
+
+    print("------------------------------")
+    print(point_str)
+    print("------------------------------")
+    point_file = open("next.txt", "w")
+
+    point_file.write(point_str)
+    point_file.close()
+
+
+    while True:
+        if input("Press q when it finished:") == "q":
+            break
+
+    voltage_file = open("voltage.txt", "r")
+    voltage = voltage_file.read()
+    voltage_file.close()
+    voltage = float(voltage)
+    result = -voltage
+
+    return result
+
+def read_voltage_obstacle(x):
     state_list = []
     point_str = str()
 
@@ -61,7 +89,7 @@ def read_voltage(x):
         point_str += str(item)
         point_str += " "
 
-    if check_connection(state_list, multi_shape=True):
+    if check_connection(state_list):
         print("------------------------------")
         print(point_str)
         print("------------------------------")

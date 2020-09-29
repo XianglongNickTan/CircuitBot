@@ -16,6 +16,7 @@ from scipy.optimize import minimize
 from methods.BaseBO import BaseBO
 from utils.DepRound import DepRound
 from utils.probability import distr, draw
+from collections import Counter
 
 
 class CoCaBO_Base(BaseBO):
@@ -93,8 +94,8 @@ class CoCaBO_Base(BaseBO):
         random.seed(108)
 
         for i in range(trials):
-            print("Running trial: ", i)
-            self.trial_num = i
+            # print("Running trial: ", i)
+            self.trial_num = 1
             # np.random.seed(i)
             # random.seed(i)
             #
@@ -122,7 +123,7 @@ class CoCaBO_Base(BaseBO):
             #     probe11, probe12, probe13, probe14, probe15, probe16, probe17, probe18, probe19, probe20]
             # initData = [np.array(initData)]
 
-            initData = [[0.0, 4.0, 4.0, 4.0, 0.0, -11.0, 1.0, -7.0, 1.0, 1.0, 1.0, 6.0, 0.0, 10.0, 1.0]]
+            initData = [[0.0, 0.0, 0.0, 1.0, 1.0, -6.33734928, 1.58121456, -6.80855969]]
             initData = [np.array(initData)]
 
             # initResult = [13.2, 16.5, 18.9, 18.9, 13.9, 18.5, 18.4, 17.3, 17.7, 18.2,
@@ -137,8 +138,8 @@ class CoCaBO_Base(BaseBO):
 
             df = self.runOptim(budget=budget, seed=None, initData=initData, initResult=initResult)
             # df = self.runOptim(budget=budget, seed=None, initData=None, initResult=None)
-            best_vals.append(df['best_value'])
-            mix_values.append(df['mix_val'])
+            # best_vals.append(df['best_value'])
+            # mix_values.append(df['model_hp'])
             self.save_progress_to_disk(best_vals, debug_values, mix_values,
                                        saving_path, df)
 
@@ -157,6 +158,13 @@ class CoCaBO_Base(BaseBO):
 
     def save_progress_to_disk(self, best_vals, debug_values, mix_values,
                               saving_path, df):
+        # results_file_name = saving_path + self.name + \
+        #                     f'_{self.batch_size}' + \
+        #                     '_best_vals_' + \
+        #                     self.acq_type + \
+        #                     '_ARD_' + str(self.ARD) + '_mix_' + \
+        #                     str(self.mix)
+
         results_file_name = saving_path + self.name + \
                             f'_{self.batch_size}' + \
                             '_best_vals_' + \
@@ -183,7 +191,9 @@ class CoCaBO_Base(BaseBO):
             with open(debug_file_name, 'wb') as file2:
                 pickle.dump(debug_values, file2)
 
-        df.to_pickle(f"{results_file_name}_df_s{self.trial_num}")
+        df.to_pickle(f"{results_file_name}_all")
+        # df.to_pickle(f"{results_file_name}")
+
 
     def compute_reward_for_all_cat_variable(self, ht_next_batch_list, batch_size):
         # Obtain the reward for each categorical variable: B x len(self.C_list)
@@ -205,7 +215,7 @@ class CoCaBO_Base(BaseBO):
             C = self.C_list[j]
             gamma = gamma_list[j]
             probabilityDistribution = probabilityDistribution_list[j]
-            print(f'cat_var={j}, prob={probabilityDistribution}')
+            # print(f'cat_var={j}, prob={probabilityDistribution}')
 
             if batch_size > 1:
                 ht_batch_list = ht_batch_list.astype(int)
