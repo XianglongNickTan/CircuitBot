@@ -9,10 +9,10 @@ y_offset = -53
 load_resistance = 45
 supply_voltage = 45
 
-bar1_x = -18
-bar2_x = 18
-bar1_shape_x = bar1_x + 4
-bar2_shape_x = bar2_x - 4
+bar1_x = 18
+bar2_x = -18
+bar1_shape_x = bar1_x - 4
+bar2_shape_x = bar2_x + 4
 
 shape_num = 5
 

@@ -90,8 +90,8 @@ class CoCaBO_Base(BaseBO):
         debug_values = []
         n_working = trials
         self.saving_path = saving_path
-        np.random.seed(108)
-        random.seed(108)
+        np.random.seed(18)
+        random.seed(18)
 
         for i in range(trials):
             # print("Running trial: ", i)
@@ -123,21 +123,24 @@ class CoCaBO_Base(BaseBO):
             #     probe11, probe12, probe13, probe14, probe15, probe16, probe17, probe18, probe19, probe20]
             # initData = [np.array(initData)]
 
-            initData = [[0.0, 0.0, 0.0, 1.0, 1.0, -6.33734928, 1.58121456, -6.80855969]]
+            # initData = [[0.0, 0.0, 0.0, 0.0, 0.0, 6.0, 0.0, -6.0], [1.0, 1.0, 1.0, 1.0, 1.0, 6.0, 0.0, -6.0]]
+            initData = [[1.0, 1.0, 1.0, 1.0, 1.0, 6.0, 0.0, -6.0]]
             initData = [np.array(initData)]
 
             # initResult = [13.2, 16.5, 18.9, 18.9, 13.9, 18.5, 18.4, 17.3, 17.7, 18.2,
             #     17.5, 18.5, 19.9, 18.0, 18.1, 18.8, 18.8, 18.5, 20.2, 16.3]
 
-            initResult = [0]
+            # initResult = [11.3**2]
+            initResult = [50]
+
 
             for i in range(len(initResult)):
                 initResult[i] = [-initResult[i]]
 
             initResult = [np.array(initResult)]
 
-            df = self.runOptim(budget=budget, seed=None, initData=initData, initResult=initResult)
-            # df = self.runOptim(budget=budget, seed=None, initData=None, initResult=None)
+            # df = self.runOptim(budget=budget, seed=None, initData=initData, initResult=initResult)
+            df = self.runOptim(budget=budget, seed=None, initData=None, initResult=None)
             # best_vals.append(df['best_value'])
             # mix_values.append(df['model_hp'])
             self.save_progress_to_disk(best_vals, debug_values, mix_values,
@@ -172,8 +175,8 @@ class CoCaBO_Base(BaseBO):
                             '_ARD_' + str(self.ARD) + '_mix_' + \
                             str(self.mix)
 
-        with open(results_file_name, 'wb') as file:
-            pickle.dump(best_vals, file)
+        # with open(results_file_name, 'wb') as file:
+        #     pickle.dump(best_vals, file)
         if self.mix > 1 or self.mix < 0:
             mix_file_name = saving_path + self.name + \
                             f'_{self.batch_size}_' + \
@@ -195,16 +198,45 @@ class CoCaBO_Base(BaseBO):
         # df.to_pickle(f"{results_file_name}")
 
 
-    def compute_reward_for_all_cat_variable(self, ht_next_batch_list, batch_size):
+    def compute_reward_for_all_cat_variable(self, ht_next_batch_list, batch_size, y_next):
         # Obtain the reward for each categorical variable: B x len(self.C_list)
         ht_batch_list_rewards = np.zeros((batch_size, len(self.C_list)))
         for b in range(batch_size):
             ht_next_list = ht_next_batch_list[b, :]
 
             for i in range(len(ht_next_list)):
-                idices = np.where(self.data[0][:, i] == ht_next_list[i])
-                ht_result = self.result[0][idices]
-                ht_reward = np.max(ht_result * -1)
+                # idices = np.where(self.data[0][:, i] == ht_next_list[i])
+                # ht_result = self.result[0][idices]
+                # # print(ht_result)
+                # ht_reward = np.max(ht_result * -1)
+                # # ht_reward = np.mean(ht_result * -1)
+                #
+                idices = np.where(self.data[0][:, i] != ht_next_list[i])
+
+                ht_result = 0
+                ht_num = 0.000000000001
+                for j in range(len(self.data[0][idices])):
+                    ht_data = self.data[0][idices][j]
+                    diff = sum([abs(ht_next_list[j] - ht_data[j]) for j in range(len(ht_next_list))])
+                    print(diff)
+                    if diff == 1:
+                        ht_result += -(y_next-self.result[0][j])*100
+                        ht_num += 100
+                    elif diff == 2:
+                        ht_result += -(y_next-self.result[0][j])*50
+                        ht_num += 50
+                    elif diff == 3:
+                        ht_result += -(y_next-self.result[0][j])*20
+                        ht_num += 20
+                    elif diff == 3:
+                        ht_result += -self.result[0][j] * 0.4
+                        ht_num += 0.4
+                    else:
+                        ht_result += -self.result[0][j] * 0.1
+                        ht_num += 0.1
+                ht_reward = ht_result / ht_num
+
+
                 ht_batch_list_rewards[b, i] = ht_reward
         return ht_batch_list_rewards
 

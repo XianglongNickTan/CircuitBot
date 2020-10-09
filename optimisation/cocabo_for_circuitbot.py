@@ -17,7 +17,7 @@ import os
 from read_voltage import read_voltage_line_circle, read_voltage_simulation
 from methods.CoCaBO import CoCaBO
 from methods.BatchCoCaBO import BatchCoCaBO
-
+import testFunctions.syntheticFunctions
 
 def CoCaBO_Exps(obj_func, budget, initN=0, trials=1, kernel_mix=0.5, batch=1):
 
@@ -27,9 +27,27 @@ def CoCaBO_Exps(obj_func, budget, initN=0, trials=1, kernel_mix=0.5, batch=1):
         os.makedirs(saving_path)
 
     # define the objective function
+    # define the objective function
+    if obj_func == 'func2C':
+        f = testFunctions.syntheticFunctions.func2C
+        categories = [3, 5]
 
-    if obj_func == 'voltage':
-        f = read_voltage_line_circle
+        bounds = [{'name': 'h1', 'type': 'categorical', 'domain': (0, 1, 2)},
+            {'name': 'h2', 'type': 'categorical', 'domain': (0, 1, 2, 3, 4)},
+            {'name': 'x1', 'type': 'continuous', 'domain': (-1, 1)},
+            {'name': 'x2', 'type': 'continuous', 'domain': (-1, 1)}]
+
+    elif obj_func == 'func3C':
+        f = testFunctions.syntheticFunctions.func3C
+        categories = [3, 5, 4]
+
+        bounds = [{'name': 'h1', 'type': 'categorical', 'domain': (0, 1, 2)},
+            {'name': 'h2', 'type': 'categorical', 'domain': (0, 1, 2, 3, 4)},
+            {'name': 'h3', 'type': 'categorical', 'domain': (0, 1, 2, 3)},
+            {'name': 'x1', 'type': 'continuous', 'domain': (-1, 1)},
+            {'name': 'x2', 'type': 'continuous', 'domain': (-1, 1)}]
+
+    elif obj_func == 'voltage':
         f = read_voltage_simulation
         # categories = [6, 6, 6, 6, 6]
         categories = [2, 2, 2, 2, 2]
@@ -121,9 +139,9 @@ def CoCaBO_Exps(obj_func, budget, initN=0, trials=1, kernel_mix=0.5, batch=1):
             {'name': 'h3', 'type': 'categorical', 'domain': (0, 1)},
             {'name': 'h4', 'type': 'categorical', 'domain': (0, 1)},
             {'name': 'h5', 'type': 'categorical', 'domain': (0, 1)},
-            {'name': 'x1', 'type': 'continuous', 'domain': (-8, -4)},
-            {'name': 'x2', 'type': 'continuous', 'domain': (-2, -2)},
-            {'name': 'x3', 'type': 'continuous', 'domain': (4, 8)}]
+            {'name': 'x1', 'type': 'continuous', 'domain': (4, 8)},
+            {'name': 'x2', 'type': 'continuous', 'domain': (-2, 2)},
+            {'name': 'x3', 'type': 'continuous', 'domain': (-8, -4)}]
 
     else:
         raise NotImplementedError

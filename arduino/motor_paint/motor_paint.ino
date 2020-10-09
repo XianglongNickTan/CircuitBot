@@ -26,5 +26,8 @@ void loop(){
 
   else if(readIn == '2'){
     digitalWrite(potEnable, HIGH);
+    delay(1100);
+    digitalWrite(potEnable, LOW);
+    readIn = '0';
   }
 }

@@ -35,7 +35,9 @@ class CoCaBO(CoCaBO_Base):
         if (initData and initResult):
             self.data = initData[:]
             self.result = initResult[:]
-        else:  # We don't need this
+        else:  # We do not need this
+            # self.data = [np.array([[]])]
+            # self.result = [np.array([[]])]
             self.data, self.result = self.initialise(seed)
 
         # Initialize wts and probs
@@ -44,13 +46,18 @@ class CoCaBO(CoCaBO_Base):
         gamma_list = [math.sqrt(C * math.log(C) /
                                 ((math.e - 1) * bestUpperBoundEstimate))
                       for C in self.C_list]
+        # gamma_list = [0.01 for C in self.C_list]
         Wc_list_init = [np.ones(C) for C in self.C_list]
         Wc_list = Wc_list_init
         nDim = len(self.bounds)
 
         result_list = []
-        starting_best = np.max(-1 * self.result[0])
-        result_list.append([-1, None, None, starting_best, None])
+        # starting_best = np.max(-1 * self.result[0])
+
+        # result_list.append([-1, None, None, None, None, None, None, None, starting_best, None])
+
+        # "iter", "ht", "xt", "zt", "line_num", "circle_num", "value", "Reward",
+        # "best_value", "model_hp"
 
         continuous_dims = list(range(len(self.C_list), nDim))
         categorical_dims = list(range(len(self.C_list)))
@@ -70,10 +77,11 @@ class CoCaBO(CoCaBO_Base):
                                                      self.bounds,
                                                      self.acq_type, b)
 
+
             y_list = y_list * -1
 
-            line = ht_list.count(0)
-            circle = ht_list.count(1)
+            line = float(ht_list.count(0))
+            circle = float(ht_list.count(1))
             cross = ht_list.count(2)
             triangle = ht_list.count(3)
             diamond = ht_list.count(4)
@@ -94,7 +102,7 @@ class CoCaBO(CoCaBO_Base):
 
             self.ht_recommedations.append(ht_list)
 
-            # print(Gt_ht_list)
+            print(Wc_list)
 
         df = pd.DataFrame(result_list, columns=["iter", "ht", "xt", "zt", "line_num", "circle_num", "value", "Reward",
                                                 "best_value", "model_hp"])
@@ -113,6 +121,7 @@ class CoCaBO(CoCaBO_Base):
                                continuous_dims, bounds, acq_type, b):
 
         #  Get observation data
+
         Zt = self.data[0]
         yt = self.result[0]
 
@@ -173,16 +182,17 @@ class CoCaBO(CoCaBO_Base):
         # Obtain the reward for each categorical variable
         ht_next_list_array = np.atleast_2d(ht_next_list)
         ht_list_rewards = self.compute_reward_for_all_cat_variable(
-            ht_next_list_array, b)
+            ht_next_list_array, b, y_next)
         ht_list_rewards = list(ht_list_rewards.flatten())
+        print((self.result))
 
         bestval_ht = np.max(self.result[0] * -1)
 
         # print(f'arm pulled={ht_next_list[:]} ; rewards = {ht_list_rewards[:]};'
         #       f' y_best = {bestval_ht}; mix={self.mix_used}')
         # print(f'arm pulled={ht_next_list[:]}; y_best = {bestval_ht}; mix={self.mix_used}')
-        # print(f'arm pulled={ht_next_list[:]}; y_best = {bestval_ht}')
-        print(f'y_best = {bestval_ht}')
+        print(f'arm pulled={ht_next_list[:]}; y_best = {bestval_ht}')
+        # print(f'y_best = {bestval_ht}')
         # print(z_next)
 
         return ht_list_rewards, x_next, z_next, y_next

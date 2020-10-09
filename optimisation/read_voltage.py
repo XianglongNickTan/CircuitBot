@@ -25,30 +25,15 @@ def read_voltage_simulation(x):
     # np.random.seed(108)
     # random.seed(108)
 
-    hor_line = state_list.count(0)
-    ver_line = state_list.count(1)
-    cross = state_list.count(2)
-    circle = state_list.count(3)
-    triangle = state_list.count(4)
-    diamond = state_list.count(5)
+    line = state_list.count(0)
+    circle = state_list.count(1)
+    # cross = state_list.count(2)
+    # circle = state_list.count(3)
+    # triangle = state_list.count(4)
+    # diamond = state_list.count(5)
 
-    if check_connection(state_list):
-        # voltage = ver_line *100
-        # if ver_line == 0:
-        #     voltage = 100
-        #     result = -voltage
-        #
-        # else:
-        #     result = 100
-        voltage = 100
-        result = -voltage
-
-        print('connected')
-
-    else:
-        result = 0.0
-        print('no connection')
-
+    voltage = line * 0.2 + circle * 10
+    result = voltage * -1
     return result
 
 def read_voltage_line_circle(x):
@@ -74,7 +59,7 @@ def read_voltage_line_circle(x):
     voltage_file = open("voltage.txt", "r")
     voltage = voltage_file.read()
     voltage_file.close()
-    voltage = float(voltage)
+    voltage = (float(voltage))**2
     result = -voltage
 
     return result

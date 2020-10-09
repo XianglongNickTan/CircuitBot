@@ -117,74 +117,7 @@ class MoveItIkDemo:
 		traj = self.arm.plan()
 		self.arm.execute(traj)
 
-	def draw_line(self, xy_start_pos, xy_end_pos, vel=0.01, times=2):
-		# waypoints = []
-		#
-		# xy_start_pos[0] = (xy_start_pos[0] + self.x_offset) * 0.01
-		# xy_start_pos[1] = (xy_start_pos[1] + self.y_offset) * 0.01
-		# xy_end_pos[0] = (xy_end_pos[0] + self.x_offset) * 0.01
-		# xy_end_pos[1] = (xy_end_pos[1] + self.y_offset) * 0.01
-		#
-		# stay_point = [0, -5]
-		# stay_point[0] = (stay_point[0] + self.x_offset) * 0.01
-		# stay_point[1] = (stay_point[1] + self.y_offset) * 0.01
-		#
-		# self.target_pose.header.stamp = rospy.Time.now()
-		# self.target_pose.pose.position.x = stay_point[0]
-		# self.target_pose.pose.position.y = stay_point[1]
-		#
-		# self.arm.set_start_state_to_current_state()
-		# self.arm.set_pose_target(self.target_pose, self.end_effector_link)
-		# traj = self.arm.plan()
-		# self.arm.execute(traj)
-		#
-		# self.target_pose.header.stamp = rospy.Time.now()
-		# self.target_pose.pose.position.x = xy_start_pos[0]
-		# self.target_pose.pose.position.y = xy_start_pos[1]
-		#
-		# self.arm.set_start_state_to_current_state()
-		# self.arm.set_pose_target(self.target_pose, self.end_effector_link)
-		# traj = self.arm.plan()
-		# self.arm.execute(traj)
-		#
-		#
-		# wpose = self.arm.get_current_pose()
-		# wpose.pose.orientation.x = 0.14578
-		# wpose.pose.orientation.y = 0.98924
-		# wpose.pose.orientation.z = -0.00853
-		# wpose.pose.orientation.w = 0.00841
-		# wpose.pose.position.z = 0.03
-		#
-		# # self.init_upright_path_constraints(wpose)
-		# # self.enable_upright_path_constraints()
-		#
-		#
-		# # for _ in range(2):
-		# for t in range(self.line_cont):
-		# 	wpose.pose.position.x = ((self.line_cont - t) * xy_start_pos[0] + t * xy_end_pos[0]) / self.line_cont
-		# 	wpose.pose.position.y = ((self.line_cont - t) * xy_start_pos[1] + t * xy_end_pos[1]) / self.line_cont
-		# 	waypoints.append(copy.deepcopy(wpose.pose))
-		#
-		# if times == 2:
-		# 	for t in range(self.line_cont):
-		# 		wpose.pose.position.x = (t * xy_start_pos[0] + (self.line_cont - t) * xy_end_pos[0]) / self.line_cont
-		# 		wpose.pose.position.y = (t * xy_start_pos[1] + (self.line_cont - t) * xy_end_pos[1]) / self.line_cont
-		# 		waypoints.append(copy.deepcopy(wpose.pose))
-		#
-		# (plan, fraction) = self.arm.compute_cartesian_path(
-		# 	waypoints,
-		# 	vel,             # SUPER IMPORTANT PARAMETER FOR VELOCITY CONTROL !!!!!
-		# 	0.0
-		# )
-		#
-		# arduino_motor.write('2')
-		# self.arm.execute(plan)
-		# arduino_motor.write('0')
-		# self.arm.stop()
-		#
-		# # self.disable_upright_path_constraints()
-		#
-		# rospy.sleep(2)
+	def draw_line(self, xy_start_pos, xy_end_pos):
 
 		xy_start_pos[0] = (xy_start_pos[0] + self.x_offset) * 0.01
 		xy_start_pos[1] = (xy_start_pos[1] + self.y_offset) * 0.01
@@ -464,57 +397,20 @@ def test(xy_center_pos):
 if __name__ == "__main__":
 	demo = MoveItIkDemo()
 
-	###########################################################################
-	points_file = open("next.txt", "r")
-	points_str = points_file.read()
-	points_list = points_str.split()
-	points_file.close()
+	center = [-5, 6]
+	start = [center[0] + 4.5, center[1]]
+	end = [center[0] - 4.5, center[1]]
+	demo.draw_line(start, end)
 
-	#################################################################
-
-	# points_list = ["1.0", "1.0", "1.0", "1.0", "1.0", "6.0", "0.0", "-6.0"]
-	shape1 = points_list[0]
-	shape2 = points_list[1]
-	shape3 = points_list[2]
-	shape4 = points_list[3]
-	shape5 = points_list[4]
-	
-	shape_list = [shape1, shape2, shape3, shape4, shape5]
-
-	print(shape_list)
-
-	center1 = [14, 0.0]
-	center2 = [float(points_list[5]), 0.0]
-	center3 = [float(points_list[6]), 0.0]
-	center4 = [float(points_list[7]), 0.0]
-	center5 = [-14, 0.0]
-
-	# center1 = [float(points_list[5]), float(points_list[6])]
-	# center2 = [float(points_list[7]), float(points_list[8])]
-	# center3 = [float(points_list[9]), float(points_list[10])]
-	# center4 = [float(points_list[11]), float(points_list[12])]
-	# center5 = [float(points_list[13]), float(points_list[14])]
-	
-	center_list = [center1, center2, center3, center4, center5]
-
-	for i in range(len(shape_list)):
-		if shape_list[i] == '0.0':
-			start = [center_list[i][0] + 4.5, center_list[i][1]]
-			end = [center_list[i][0] - 4.5, center_list[i][1]]
-			demo.draw_line(start, end, 0.01, times=1)
-		elif shape_list[i] == '1.0':
-			demo.draw_circle(center_list[i])
-		elif shape_list[i] == '2.0':
-			demo.draw_cross(center_list[i])
-		elif shape_list[i] == '3.0':
-			demo.draw_triangle(center_list[i])
-		elif shape_list[i] == '4.0':
-			demo.draw_square(center_list[i])
-		elif shape_list[i] == '5.0':
-			demo.draw_square(center_list[i])
-		else:
-			raise NotImplementedError
-
+	# center = [0, 4]
+	# start = [center[0] + 5, center[1]]
+	# end = [center[0] - 5, center[1]]
+	# demo.draw_line(start, end)
+	#
+	# center = [-9, -4]
+	# start = [center[0] + 5, center[1]]
+	# end = [center[0] - 5, center[1]]
+	# demo.draw_line(start, end)
 
 	moveit_commander.roscpp_shutdown()
 	moveit_commander.os._exit(0)
