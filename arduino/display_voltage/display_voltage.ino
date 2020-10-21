@@ -106,7 +106,7 @@ void PrintVoltage() {
   // tft.setTextSize(3);
   // tft.println("Voltage");
   tft.setCursor(10, 60);
-  tft.setTextColor(MAGENTA);
+  tft.setTextColor(WHITE);
   tft.setTextSize(4);
   tft.print(voltage,1);
 //  tft.setTextSize(4)/;

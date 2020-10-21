@@ -25,16 +25,42 @@ def read_voltage_simulation(x):
     # np.random.seed(108)
     # random.seed(108)
 
+    # print(state_list)
     line = state_list.count(0)
     circle = state_list.count(1)
-    # cross = state_list.count(2)
-    # circle = state_list.count(3)
-    # triangle = state_list.count(4)
-    # diamond = state_list.count(5)
 
-    voltage = line * 0.2 + circle * 10
-    result = voltage * -1
-    return result
+    #
+    # if state_list[2] == 1:
+    #     resistance = 360
+    #     voltage = 1.2
+    #     print('..................')
+    #     print('shit')
+    #     print('..................')
+    #
+    # elif (state_list[5] < 6) & (state_list[1] == 1):
+    #     voltage = 1
+    #     print('..................')
+    #     print('shit')
+    #     print('..................')
+    #
+    # elif (state_list[7] > -6) & (state_list[3] == 1):
+    #     voltage = 0.9
+    #     print('..................')
+    #     print('shit')
+    #     print('..................')
+    # else:
+    #     resistance = 80 - circle * 6 + line * 3
+    #     voltage = (11 + circle * 0.6) - 0.5 + random.random()
+
+    voltage = (11 + circle * 0.8) - 0.8 + random.random()
+
+
+    # resistance = (80 - circle * 6 + random.random()) * -1
+    # resistance = 80 - circle * 6 + random.random() - 60
+
+    # resistance = -1 * pow(10, circle)
+
+    return voltage
 
 def read_voltage_line_circle(x):
     point_str = str()
@@ -43,9 +69,9 @@ def read_voltage_line_circle(x):
         point_str += str(item)
         point_str += " "
 
-    print("------------------------------")
-    print(point_str)
-    print("------------------------------")
+    # print("------------------------------")
+    # print(point_str)
+    # print("------------------------------")
     point_file = open("next.txt", "w")
 
     point_file.write(point_str)
@@ -59,10 +85,10 @@ def read_voltage_line_circle(x):
     voltage_file = open("voltage.txt", "r")
     voltage = voltage_file.read()
     voltage_file.close()
-    voltage = (float(voltage))**2
-    result = -voltage
+    voltage = (float(voltage))
+    # resistance = (30 - voltage) / voltage * 45
 
-    return result
+    return voltage
 
 def read_voltage_obstacle(x):
     state_list = []

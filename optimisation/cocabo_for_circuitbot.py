@@ -49,74 +49,8 @@ def CoCaBO_Exps(obj_func, budget, initN=0, trials=1, kernel_mix=0.5, batch=1):
 
     elif obj_func == 'voltage':
         f = read_voltage_simulation
-        # categories = [6, 6, 6, 6, 6]
+        # categories = [3, 3, 3, 3, 3]
         categories = [2, 2, 2, 2, 2]
-
-        # bounds = [{'name': 'h1', 'type': 'categorical', 'domain': (0, 1, 2, 3, 4, 5)},
-        #     {'name': 'h2', 'type': 'categorical', 'domain': (0, 1, 2, 3, 4, 5)},
-        #     {'name': 'h3', 'type': 'categorical', 'domain': (0, 1, 2, 3, 4, 5)},
-        #     {'name': 'h4', 'type': 'categorical', 'domain': (0, 1, 2, 3, 4, 5)},
-        #     {'name': 'h5', 'type': 'categorical', 'domain': (0, 1, 2, 3, 4, 5)},
-        #     {'name': 'x1', 'type': 'continuous', 'domain': (-12, 12)},
-        #     {'name': 'y1', 'type': 'continuous', 'domain': (-5, 5)},
-        #     {'name': 'x2', 'type': 'continuous', 'domain': (-12, 12)},
-        #     {'name': 'y2', 'type': 'continuous', 'domain': (-5, 5)},
-        #     {'name': 'x3', 'type': 'continuous', 'domain': (-12, 12)},
-        #     {'name': 'y3', 'type': 'continuous', 'domain': (-5, 5)},
-        #     {'name': 'x4', 'type': 'continuous', 'domain': (-12, 12)},
-        #     {'name': 'y4', 'type': 'continuous', 'domain': (-5, 5)},
-        #     {'name': 'x5', 'type': 'continuous', 'domain': (-12, 12)},
-        #     {'name': 'y5', 'type': 'continuous', 'domain': (-5, 5)}]
-
-        # bounds = [{'name': 'h1', 'type': 'categorical', 'domain': (0, 1, 2, 3, 4, 5)},
-        #     {'name': 'h2', 'type': 'categorical', 'domain': (0, 1, 2, 3, 4, 5)},
-        #     {'name': 'h3', 'type': 'categorical', 'domain': (0, 1, 2, 3, 4, 5)},
-        #     {'name': 'h4', 'type': 'categorical', 'domain': (0, 1, 2, 3, 4, 5)},
-        #     {'name': 'h5', 'type': 'categorical', 'domain': (0, 1, 2, 3, 4, 5)},
-        #     {'name': 'x1', 'type': 'continuous', 'domain': (-12, -9)},
-        #     {'name': 'y1', 'type': 'continuous', 'domain': (-2, 2)},
-        #     {'name': 'x2', 'type': 'continuous', 'domain': (-6, -2)},
-        #     {'name': 'y2', 'type': 'continuous', 'domain': (-2, 2)},
-        #     {'name': 'x3', 'type': 'continuous', 'domain': (-2, 2)},
-        #     {'name': 'y3', 'type': 'continuous', 'domain': (-2, 2)},
-        #     {'name': 'x4', 'type': 'continuous', 'domain': (2, 6)},
-        #     {'name': 'y4', 'type': 'continuous', 'domain': (-2, 2)},
-        #     {'name': 'x5', 'type': 'continuous', 'domain': (9, 12)},
-        #     {'name': 'y5', 'type': 'continuous', 'domain': (-2, 2)}]
-
-
-        # bounds = [{'name': 'h1', 'type': 'categorical', 'domain': (0, 1)},
-        #     {'name': 'h2', 'type': 'categorical', 'domain': (0, 1)},
-        #     {'name': 'h3', 'type': 'categorical', 'domain': (0, 1)},
-        #     {'name': 'h4', 'type': 'categorical', 'domain': (0, 1)},
-        #     {'name': 'h5', 'type': 'categorical', 'domain': (0, 1)},
-        #     {'name': 'x1', 'type': 'continuous', 'domain': (-12, -9)},
-        #     {'name': 'y1', 'type': 'continuous', 'domain': (-2, 2)},
-        #     {'name': 'x2', 'type': 'continuous', 'domain': (-6, -2)},
-        #     {'name': 'y2', 'type': 'continuous', 'domain': (-2, 2)},
-        #     {'name': 'x3', 'type': 'continuous', 'domain': (-2, 2)},
-        #     {'name': 'y3', 'type': 'continuous', 'domain': (-2, 2)},
-        #     {'name': 'x4', 'type': 'continuous', 'domain': (2, 6)},
-        #     {'name': 'y4', 'type': 'continuous', 'domain': (-2, 2)},
-        #     {'name': 'x5', 'type': 'continuous', 'domain': (9, 12)},
-        #     {'name': 'y5', 'type': 'continuous', 'domain': (-2, 2)}]
-
-
-        # bounds = [{'name': 'h1', 'type': 'categorical', 'domain': (0, 1)},
-        #     {'name': 'h2', 'type': 'categorical', 'domain': (0, 1)},
-        #     {'name': 'h3', 'type': 'categorical', 'domain': (0, 1)},
-        #     {'name': 'h4', 'type': 'categorical', 'domain': (0, 1)},
-        #     {'name': 'h5', 'type': 'categorical', 'domain': (0, 1)},
-        #     {'name': 'x1', 'type': 'continuous', 'domain': (-12, -10)},
-        #     {'name': 'y1', 'type': 'continuous', 'domain': (-2, 2)},
-        #     {'name': 'x2', 'type': 'continuous', 'domain': (-8, -4)},
-        #     {'name': 'y2', 'type': 'continuous', 'domain': (-2, 2)},
-        #     {'name': 'x3', 'type': 'continuous', 'domain': (-2, 2)},
-        #     {'name': 'y3', 'type': 'continuous', 'domain': (-2, 2)},
-        #     {'name': 'x4', 'type': 'continuous', 'domain': (4, 8)},
-        #     {'name': 'y4', 'type': 'continuous', 'domain': (-2, 2)},
-        #     {'name': 'x5', 'type': 'continuous', 'domain': (10, 12)},
-        #     {'name': 'y5', 'type': 'continuous', 'domain': (-2, 2)}]
 
         # init = -14 14
 
@@ -132,8 +66,19 @@ def CoCaBO_Exps(obj_func, budget, initN=0, trials=1, kernel_mix=0.5, batch=1):
         #     {'name': 'x3', 'type': 'continuous', 'domain': (4, 8)},
         #     {'name': 'y3', 'type': 'continuous', 'domain': (-2, 2)}]
 
-        # init = -14 14
+        #
+        # bounds = [{'name': 'h1', 'type': 'categorical', 'domain': (0, 1, 2)},
+        #     {'name': 'h2', 'type': 'categorical', 'domain': (0, 1, 2)},
+        #     {'name': 'h3', 'type': 'categorical', 'domain': (0, 1, 2)},
+        #     {'name': 'h4', 'type': 'categorical', 'domain': (0, 1, 2)},
+        #     {'name': 'h5', 'type': 'categorical', 'domain': (0, 1, 2)},
+        #     {'name': 'x1', 'type': 'continuous', 'domain': (4, 8)},
+        #     {'name': 'x2', 'type': 'continuous', 'domain': (-2, 2)},
+        #     {'name': 'x3', 'type': 'continuous', 'domain': (-8, -4)}]
 
+
+        # init = -14 14
+        #
         bounds = [{'name': 'h1', 'type': 'categorical', 'domain': (0, 1)},
             {'name': 'h2', 'type': 'categorical', 'domain': (0, 1)},
             {'name': 'h3', 'type': 'categorical', 'domain': (0, 1)},

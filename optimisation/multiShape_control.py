@@ -9,6 +9,7 @@ import math
 import numpy as np
 import copy
 import serial
+import random
 import os
 
 
@@ -471,8 +472,14 @@ if __name__ == "__main__":
 	points_file.close()
 
 	#################################################################
+	c1 = random.uniform(4, 8)
+	c2 = random.uniform(-2, 2)
+	c3 = random.uniform(-8, -4)
 
 	# points_list = ["1.0", "1.0", "1.0", "1.0", "1.0", "6.0", "0.0", "-6.0"]
+	# points_list = ["0.0", "0.0", "0.0", "0.0", "0.0", str(c1), str(c2), str(c3)]
+	# print(points_list)
+
 	shape1 = points_list[0]
 	shape2 = points_list[1]
 	shape3 = points_list[2]
@@ -481,7 +488,7 @@ if __name__ == "__main__":
 	
 	shape_list = [shape1, shape2, shape3, shape4, shape5]
 
-	print(shape_list)
+	# print(shape_list)
 
 	center1 = [14, 0.0]
 	center2 = [float(points_list[5]), 0.0]

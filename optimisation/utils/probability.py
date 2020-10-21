@@ -39,6 +39,7 @@ def distr(weights, gamma=0.0):
     return tuple((1.0 - gamma) * (w / theSum) + (gamma / len(weights)) for w in weights)
 
 
+
 def mean(aList):
     theSum = 0
     count = 0

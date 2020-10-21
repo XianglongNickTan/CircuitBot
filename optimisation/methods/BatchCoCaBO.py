@@ -34,7 +34,7 @@ class BatchCoCaBO(CoCaBO_Base):
         self.name = 'BCoCaBO'
 
     def runOptim(self, budget, seed, initData=None,
-                 initResult=None, ):
+                 initResult=None):
 
         if (initData and initResult):
             self.data = initData[:]
@@ -47,6 +47,7 @@ class BatchCoCaBO(CoCaBO_Base):
         gamma_list = [np.sqrt(C * math.log(C / self.batch_size) / (
                 (math.e - 1) * self.batch_size * bestUpperBoundEstimate))
                       for C in self.C_list]
+
         gamma_list = [g if not np.isnan(g) else 1 for g in gamma_list]
 
         Wc_list_init = [np.ones(C) for C in self.C_list]
@@ -54,8 +55,8 @@ class BatchCoCaBO(CoCaBO_Base):
         nDim = len(self.bounds)
 
         result_list = []
-        starting_best = np.max(-1 * self.result[0])
-        result_list.append([-1, None, None, starting_best, None])
+        # starting_best = np.max(-1 * self.result[0])
+        # result_list.append([-1, None, None, starting_best, None])
 
         continuous_dims = list(range(len(self.C_list), nDim))
         categorical_dims = list(range(len(self.C_list)))
@@ -68,7 +69,7 @@ class BatchCoCaBO(CoCaBO_Base):
             ht_batch_list = ht_batch_list.astype(int)
 
             # Obtain the reward for multi-armed bandit: B x len(self.C_list)
-            Gt_ht_list = self.RewardperCategoryviaBO(self.f, ht_batch_list,
+            Gt_ht_list, z_batch_next, y_batch_next = self.RewardperCategoryviaBO(self.f, ht_batch_list,
                                                      categorical_dims,
                                                      continuous_dims)
 
@@ -80,18 +81,29 @@ class BatchCoCaBO(CoCaBO_Base):
                                                           self.batch_size,
                                                           S0=S0)
 
+
             # Get the best value till now
             besty, li, vi = self.getBestVal2(self.result)
 
+            if self.use_mean:
+                besty = (besty * (self.std_y + 1e-10) + self.mean_y) / self.reward_scale
+
             # Store the results of this iteration
-            result_list.append(
-                [t, ht_batch_list, Gt_ht_list, besty, self.mix_used,
-                 self.model_hp])
+
+            for i in range(self.batch_size):
+
+                result_list.append(
+                    [ht_batch_list[i], z_batch_next[i], y_batch_next[i][0], besty, self.model_hp])
+
             self.ht_recommedations.append(ht_batch_list)
 
-        df = pd.DataFrame(result_list,
-                          columns=["iter", "ht", "Reward", "best_value",
-                                   "mix_val", "model_hp"])
+            # if self.print_bestval:
+            #     print(f'y_best = {besty}')
+            # if self.print_weight:
+            #     print(Wc_list)
+
+
+        df = pd.DataFrame(result_list, columns=["ht", "zt", "value", "best_value", "model_hp"])
         bestx = self.data[li][vi]
         self.best_val_list.append(
             [self.batch_size, self.trial_num, li, besty, bestx])
@@ -132,9 +144,9 @@ class BatchCoCaBO(CoCaBO_Base):
         acq_dict = {'type': 'subspace'}
 
         acq_opt_params = {'method': 'samplegrad',
-                          'num_local': 5,
-                          'num_samples': 5000,
-                          'num_chunks': 10,
+                          'num_local': 2,
+                          'num_samples': 20,
+                          'num_chunks': 5,
                           'verbose': False}
 
         ymin_opt_params = {'method': 'standard'}
@@ -188,15 +200,29 @@ class BatchCoCaBO(CoCaBO_Base):
 
         #  Evaluate objective function at
         y_batch_next = np.zeros((self.batch_size, 1))
+        y_batch_next_original = np.zeros((self.batch_size, 1))
         for b in range(self.batch_size):
             x_next = z_batch_next[b, continuous_dims]
             ht_next_list = z_batch_next[b, categorical_dims]
             try:
                 y_next = objfn(z_batch_next[b])
+
+                y_next *= self.reward_scale
+
+                if self.use_mean:
+                    y_next = (y_next - self.mean_y) / (self.std_y + 1e-10)
+                    y_batch_next[b] = y_next
+                    ########### change back to normalised before #############
+                    y_next = (y_next * (self.std_y + 1e-10) + self.mean_y) / self.reward_scale
+                    y_batch_next_original[b] = y_next
+
+                else:
+                    y_batch_next[b] = y_next
+                    y_next /= self.reward_scale
+                    y_batch_next_original[b] = y_next
+
             except:
                 print('stop')
-
-            y_batch_next[b] = y_next
 
         # Append recommeded data
         self.mix_used = gp.kern.mix[0]
@@ -207,14 +233,14 @@ class BatchCoCaBO(CoCaBO_Base):
         ht_batch_list_rewards = self.compute_reward_for_all_cat_variable(
             ht_next_batch_list, self.batch_size)
 
-        bestval_ht = np.max(self.result[0] * -1)
+        bestval_ht = np.max(self.result[0])
         # print(f'arm pulled={ht_next_batch_list[:]} ; '
         #       f'\n rewards = {ht_batch_list_rewards[:]}; '
         #       f'y_best = {bestval_ht}; mix={self.mix_used}')
         print(f'arm pulled={ht_next_batch_list[:]} ; '
               f'y_best = {bestval_ht}; mix={self.mix_used}')
 
-        return ht_batch_list_rewards
+        return ht_batch_list_rewards, z_batch_next, y_batch_next_original
 
     def get_kernel(self, categorical_dims, continuous_dims):
         # Create surrogate model

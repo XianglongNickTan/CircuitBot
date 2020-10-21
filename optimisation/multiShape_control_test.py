@@ -397,10 +397,20 @@ def test(xy_center_pos):
 if __name__ == "__main__":
 	demo = MoveItIkDemo()
 
-	center = [-5, 6]
-	start = [center[0] + 4.5, center[1]]
-	end = [center[0] - 4.5, center[1]]
-	demo.draw_line(start, end)
+	center = [14, 0]
+	# start = [center[0] + 4.5, center[1]]
+	# end = [center[0] - 4.5, center[1]]
+	demo.draw_circle(center)
+
+
+	center = [14, 0]
+	# start = [center[0] + 4.5, center[1]]
+	# end = [center[0] - 4.5, center[1]]
+	demo.draw_circle(center)
+
+
+	# center = [-8, 0]
+	# demo.draw_line(start, end)
 
 	# center = [0, 4]
 	# start = [center[0] + 5, center[1]]

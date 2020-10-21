@@ -50,6 +50,7 @@ class BaseBO():
                 init_data = pickle.load(init_data_filefile2)
             Zinit = init_data['Z_init']
             yinit = init_data['y_init']
+
         else:
             print(f"Creating init data for seed {seed}")
             Xinit = self.generateInitialPoints(self.initN,
