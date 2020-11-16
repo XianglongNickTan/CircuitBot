@@ -103,8 +103,11 @@ class CoCaBO_Base(BaseBO):
         debug_values = []
         n_working = trials
         self.saving_path = saving_path
-        np.random.seed(122)
-        random.seed(122)
+        np.random.seed(2)
+        random.seed(2)
+
+        # np.random.seed(8)
+        # random.seed(8)
 
         for i in range(trials):
             # print("Running trial: ", i)
@@ -114,47 +117,49 @@ class CoCaBO_Base(BaseBO):
 
             ####### initilise ########
 
-            # init_fname = f'init_data/init_data_5points_no_barrier'
-            #
-            # with open(init_fname, 'rb') as init_data_filefile2:
-            #     init_data = pickle.load(init_data_filefile2)
-            # Zinit = init_data['Z_init']
-            # yinit = init_data['y_init_v']
-            #
-            # # set reward scale factor
-            # yinit *= self.reward_scale
-            #
-            # # self.mean_y = np.mean(yinit)
-            # self.mean_y = 11.3
-            #
-            # self.std_y = np.std(yinit)
-            #
-            # if self.use_mean:
-            #     for i in range(len(yinit)):
-            #         yinit[i] = (yinit[i] - self.mean_y) / (self.std_y + 1e-10)
-            #
-            # initData.append(Zinit)
-            # initResult.append(yinit)
+            init_fname = f'init_data/init_data_5points_with_barrier'
+
+            with open(init_fname, 'rb') as init_data_filefile2:
+                init_data = pickle.load(init_data_filefile2)
+            Zinit = init_data['Z_init']
+            yinit = init_data['y_init_v']
+
+            # set reward scale factor
+            yinit *= self.reward_scale
+
+            self.mean_y = np.mean(yinit)
+            # self.mean_y = 10
+
+            self.std_y = np.std(yinit)
+
+            if self.use_mean:
+                for i in range(len(yinit)):
+                    yinit[i] = (yinit[i] - self.mean_y) / (self.std_y + 1e-10)
+
+            initData.append(Zinit)
+            initResult.append(yinit)
 
             #############################
 
+            ####### initilise ########
 
+            # initData = [[1., 1., 1., 1., 1., 6., 0., -6.]]
+            # initData = [np.array(initData)]
+            #
+            # # initResult = [74.46902655]
+            # initResult = [4.75]
+            #
+            # self.mean_y = 11.3
+            #
+            # self.std_y = 0.8
+            #
+            #
+            # for i in range(len(initResult)):
+            #     initResult[i] = [initResult[i]]
+            # initResult = [np.array(initResult) * self.reward_scale]
 
+            #############################
 
-            initData = [[1., 1., 1., 1., 1., 6., 0., -6.]]
-            initData = [np.array(initData)]
-
-            # initResult = [74.46902655]
-            initResult = [4.75]
-
-            self.mean_y = 11.3
-
-            self.std_y = 0.8
-
-
-            for i in range(len(initResult)):
-                initResult[i] = [initResult[i]]
-            initResult = [np.array(initResult) * self.reward_scale]
 
             df = self.runOptim(budget=budget, seed=None, initData=initData, initResult=initResult)
             # df = self.runOptim(budget=budget, seed=None, initData=None, initResult=None)

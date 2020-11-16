@@ -30,29 +30,29 @@ def read_voltage_simulation(x):
     circle = state_list.count(1)
 
     #
-    # if state_list[2] == 1:
-    #     resistance = 360
-    #     voltage = 1.2
-    #     print('..................')
-    #     print('shit')
-    #     print('..................')
-    #
-    # elif (state_list[5] < 6) & (state_list[1] == 1):
-    #     voltage = 1
-    #     print('..................')
-    #     print('shit')
-    #     print('..................')
-    #
-    # elif (state_list[7] > -6) & (state_list[3] == 1):
-    #     voltage = 0.9
-    #     print('..................')
-    #     print('shit')
-    #     print('..................')
-    # else:
-    #     resistance = 80 - circle * 6 + line * 3
-    #     voltage = (11 + circle * 0.6) - 0.5 + random.random()
+    if state_list[2] == 1:
+        resistance = 360
+        voltage = 3
+        print('..................')
+        print('shit')
+        print('..................')
 
-    voltage = (11 + circle * 0.8) - 0.8 + random.random()
+    elif (state_list[5] < 6) & (state_list[1] == 1):
+        voltage = 9
+        print('..................')
+        print('shit')
+        print('..................')
+
+    elif (state_list[7] > -6) & (state_list[3] == 1):
+        voltage = 9
+        print('..................')
+        print('shit')
+        print('..................')
+    else:
+        resistance = 80 - circle * 6 + line * 3
+        voltage = (11 + circle * 0.8) - 0.8 + random.random()
+
+    # voltage = (11 + circle * 0.8) - 0.8 + random.random()
 
 
     # resistance = (80 - circle * 6 + random.random()) * -1

@@ -51,18 +51,18 @@ class CoCaBO(CoCaBO_Base):
                       for C in self.C_list]
 
         #####################
-        gamma_list = [0.1555754826798944 for C in self.C_list]
+        # gamma_list = [0.1555754826798944 for C in self.C_list]
         #####################
 
 
         Wc_list_init = [np.ones(C) for C in self.C_list]
 
         ###########
-        Wc_list_init = [np.array([1, 2.2897309854472105]),
-                        np.array([1, 4.7361019048697415]),
-                        np.array([1, 73.17207652394148]),
-                        np.array([1, 7.710164430018213]),
-                        np.array([1, 3.471682642581374])]
+        # Wc_list_init = [np.array([1, 2.2897309854472105]),
+        #                 np.array([1, 4.7361019048697415]),
+        #                 np.array([1, 73.17207652394148]),
+        #                 np.array([1, 7.710164430018213]),
+        #                 np.array([1, 3.471682642581374])]
         ###########
 
         Wc_list = Wc_list_init
@@ -74,10 +74,10 @@ class CoCaBO(CoCaBO_Base):
         categorical_dims = list(range(len(self.C_list)))
 
         ################### import data draw prob ##############
-        data_fname = f'data/experiment_mean_no_barrier'
-
-        with open(data_fname, 'rb') as init_data_file:
-            self.exp_data = pickle.load(init_data_file)
+        # data_fname = f'data/experiment_mean_no_barrier'
+        #
+        # with open(data_fname, 'rb') as init_data_file:
+        #     self.exp_data = pickle.load(init_data_file)
 
         ########################################################
 
